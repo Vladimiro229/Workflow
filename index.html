@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hesh Order Stage — Mini</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#e5e7eb;
+
+      --done:#22c55e;
+      --progress:#3b82f6;
+      --blocked:#f59e0b;
+      --rework:#ef4444;
+      --todo:#94a3b8;
+
+      --shadow: 0 10px 25px rgba(15, 23, 42, .08);
+      --r:16px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans";
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 14px 40px;
+    }
+
+    .topbar{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom: 14px;
+    }
+
+    .brand{
+      display:flex; gap:10px; align-items:center;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .cat{
+      width:38px; height:38px; border-radius: 12px;
+      display:grid; place-items:center;
+      background:linear-gradient(135deg,#e2e8f0,#ffffff);
+      border:1px solid var(--line);
+      box-shadow: 0 6px 14px rgba(2,6,23,.06);
+      font-size:20px;
+    }
+
+    .search{
+      flex:1;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+    .input{
+      display:flex; align-items:center; gap:10px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: 0 6px 14px rgba(2,6,23,.05);
+      min-width: min(520px, 100%);
+    }
+    .input input{
+      border:0; outline:0; width:100%;
+      font-size:14px; background:transparent;
+    }
+    .btn{
+      border:0;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: linear-gradient(135deg,#2563eb,#60a5fa);
+      color:white;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow: 0 10px 18px rgba(37,99,235,.22);
+    }
+    .btn:active{transform: translateY(1px)}
+    .ghost{
+      border:1px solid var(--line);
+      background:var(--card);
+      box-shadow: 0 6px 14px rgba(2,6,23,.05);
+      color:var(--text);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.6fr .9fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr}
+      .input{min-width:100%}
+      .search{justify-content:stretch}
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+    }
+    .card h3{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+    .card .hd{
+      padding: 14px 14px 10px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom: 1px solid var(--line);
+    }
+    .card .bd{padding: 14px}
+
+    .pill{
+      font-size:12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background:#f8fafc;
+      color:var(--muted);
+      font-weight:700;
+      white-space:nowrap;
+    }
+    .pill.done{background:rgba(34,197,94,.12); border-color:rgba(34,197,94,.28); color:#15803d;}
+    .pill.progress{background:rgba(59,130,246,.12); border-color:rgba(59,130,246,.28); color:#1d4ed8;}
+    .pill.blocked{background:rgba(245,158,11,.14); border-color:rgba(245,158,11,.30); color:#b45309;}
+    .pill.rework{background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.28); color:#b91c1c;}
+    .pill.todo{background:rgba(148,163,184,.12); border-color:rgba(148,163,184,.30); color:#475569;}
+
+    .meta{
+      display:flex; gap:10px; flex-wrap:wrap;
+      color:var(--muted);
+      font-size:13px;
+      margin-top: 6px;
+    }
+
+    .progressRow{
+      display:flex; align-items:center; gap:10px;
+      margin-top: 10px;
+    }
+    .bar{
+      flex:1;
+      height: 10px;
+      background:#eef2ff;
+      border:1px solid #e0e7ff;
+      border-radius:999px;
+      overflow:hidden;
+    }
+    .bar > div{
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg,#2563eb,#60a5fa);
+      border-radius:999px;
+      transition: width .35s ease;
+    }
+
+    /* Timeline */
+    .timeline{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .stage{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background:#fff;
+      min-width: 170px;
+      position:relative;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: var(--todo);
+    }
+    .stage .name{
+      font-weight:800; font-size:13px;
+      line-height:1.1;
+    }
+    .stage .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+    .stage.active{
+      border-color: rgba(59,130,246,.35);
+      box-shadow: 0 10px 20px rgba(59,130,246,.12);
+      outline: 2px solid rgba(59,130,246,.15);
+      animation: pulse 1.4s infinite;
+    }
+    @keyframes pulse{
+      0%,100%{outline-offset:0}
+      50%{outline-offset:3px}
+    }
+
+    .stage.done .dot{background:var(--done)}
+    .stage.progress .dot{background:var(--progress)}
+    .stage.blocked .dot{background:var(--blocked)}
+    .stage.rework .dot{background:var(--rework)}
+    .stage.todo .dot{background:var(--todo)}
+
+    /* Line items */
+    .items{
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .item{
+      border:1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      display:grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 12px;
+      align-items:center;
+      background:#fff;
+    }
+    .img{
+      width:64px; height:64px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      display:grid; place-items:center;
+      background: linear-gradient(135deg,#f1f5f9,#ffffff);
+      color:#334155;
+      font-size:26px;
+    }
+    .item .title{
+      font-weight:900;
+      font-size:14px;
+      margin:0 0 4px;
+    }
+    .item .desc{
+      color:var(--muted);
+      font-size:12px;
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .item .right{
+      display:flex;
+      align-items:flex-end;
+      flex-direction:column;
+      gap:8px;
+      min-width: 180px;
+    }
+    .miniBar{
+      width: 180px;
+      height: 8px;
+      border-radius: 999px;
+      background:#f1f5f9;
+      border:1px solid #e2e8f0;
+      overflow:hidden;
+    }
+    .miniBar > div{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background: linear-gradient(90deg,#22c55e,#86efac);
+      transition: width .35s ease;
+    }
+    .kv{
+      display:flex; gap:10px; flex-wrap:wrap;
+      font-size:12px; color:var(--muted);
+    }
+    .kv b{color:var(--text)}
+    .muted{color:var(--muted)}
+    .small{font-size:12px}
+
+    .sideBig{
+      font-size: 18px;
+      font-weight: 1000;
+      margin: 4px 0 6px;
+      letter-spacing:.2px;
+    }
+    .sideHint{
+      color:var(--muted);
+      font-size:13px;
+      margin:0;
+    }
+    .risk{
+      margin-top: 12px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .risk .row{
+      display:flex; gap:10px; align-items:center;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px dashed var(--line);
+      background:#fbfdff;
+      font-size: 13px;
+    }
+    .risk .row strong{font-weight:900}
+    .sep{height:1px;background:var(--line);margin:12px 0}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="cat" title="котик-бренд 🐱">🐱</div>
+        <div>
+          <div style="font-size:14px;">Hesh</div>
+          <div class="muted small">Mini: Пошук стадії замовлення</div>
+        </div>
+      </div>
+
+      <div class="search">
+        <div class="input" title="Введіть external_order_id">
+          <span class="muted">🔎</span>
+          <input id="q" placeholder="Напр.: O-AW-3918" autocomplete="off" />
+        </div>
+        <button class="btn" id="btnSearch">Знайти</button>
+        <button class="btn ghost" id="btnDemo" title="Показати демо дані">Демо</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- Left -->
+      <div class="card">
+        <div class="hd">
+          <h3>Замовлення</h3>
+          <span id="orderStatusPill" class="pill progress">У роботі</span>
+        </div>
+        <div class="bd">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div>
+              <div style="font-weight:1000;font-size:18px;" id="orderId">—</div>
+              <div class="meta" id="orderMeta">
+                <span>Створено: —</span>
+                <span>Дедлайн: —</span>
+                <span>Клієнт: —</span>
+              </div>
+
+              <div class="progressRow">
+                <div class="pill" id="syncPill">Sync: —</div>
+                <div class="bar" aria-label="progress">
+                  <div id="orderProgressBar"></div>
+                </div>
+                <div class="muted small" id="orderProgressText">—%</div>
+              </div>
+            </div>
+
+            <div style="min-width:260px;">
+              <div class="muted small">Поточна стадія (по замовленню)</div>
+              <div class="sideBig" id="orderCurrentStage">—</div>
+              <div class="muted small" id="orderCurrentHint">Визначається з line_items: InProgress → current task</div>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <h3 style="margin:0;">Workflow (спрощено)</h3>
+            <div class="muted small">Підтягуємо всі процеси, активний етап підсвічуємо</div>
+          </div>
+          <div style="margin-top:12px;" class="timeline" id="timeline"></div>
+
+          <div class="sep"></div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <h3 style="margin:0;">Позиції замовлення</h3>
+            <div class="muted small" id="itemsSummary">—</div>
+          </div>
+          <div style="margin-top:12px;" class="items" id="items"></div>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="card">
+        <div class="hd">
+          <h3>Панель менеджера</h3>
+          <span class="pill" id="mgrBadge">Швидкий огляд</span>
+        </div>
+        <div class="bd">
+          <div class="muted small">Що казати клієнту</div>
+          <div class="sideBig" id="callout">—</div>
+          <p class="sideHint" id="calloutHint">—</p>
+
+          <div class="sep"></div>
+
+          <div class="muted small">Статистика</div>
+          <div class="kv" style="margin-top:8px;">
+            <span><b id="stDone">0</b> виконано</span>
+            <span><b id="stProg">0</b> у роботі</span>
+            <span><b id="stTodo">0</b> не старт</span>
+            <span><b id="stRisk">0</b> ризики</span>
+          </div>
+
+          <div class="risk" id="risks"></div>
+
+          <div class="sep"></div>
+          <div class="muted small">Підказка</div>
+          <div class="small muted" style="margin-top:6px;">
+            У проді айтішник під’єднає Hesh API:<br/>
+            <b>Get order</b> → <b>Get state line_item</b> → (опц.) <b>Get state workflow</b>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== DEMO DATA (замість API) =====
+    // У реалі айтішник підставить дані з Hesh API.
+    const DEMO = {
+      order: {
+        external_order_id: "O-AW-3918",
+        customer: "Марина Awarder",
+        created_at: "21.02.2026",
+        deadline: "13.02.2026",
+        sync_status: "OK", // OK / WARN / ERROR
+        progress: 79,
+      },
+      workflowStages: [
+        "Створення макету",
+        "Контроль макету",
+        "Друк на плівці",
+        "Вирізання циферблата",
+        "Збірка циферблата",
+        "Контроль якості циферблата",
+        "Збірка годинника",
+        "Нанесення гравіювання",
+        "Контроль якості годинника",
+        "Відправка товару"
+      ],
+      // line_items з "current/prev/next" як результат state-методів
+      line_items: [
+        {
+          id:"LI-1010-GREEN",
+          icon:"📦",
+          title:"Коробочка тактична 1010 — індивідуальний дизайн",
+          sku:"1010 Зелена",
+          qty:1,
+          tags:["ТК: Лазер+УФ"],
+          status:"Done", // Done / InProgress / NotStarted / Blocked / Rework
+          percent:100,
+          prev:"Збірка циферблата",
+          current:"Відправка товару",
+          next:"—"
+        },
+        {
+          id:"LI-AW055",
+          icon:"⌚",
+          title:"Awarder 055 — індивідуальний дизайн",
+          sku:"Silver-Black",
+          qty:1,
+          tags:["ТЦ: УФ+Лазер","ТЗ: Новий","ТШ: Двошаровий","Гравіювання"],
+          status:"InProgress",
+          percent:58,
+          prev:"Вирізання циферблата",
+          current:"Збірка циферблата",
+          next:"Контроль якості циферблата"
+        }
+      ]
+    };
+
+    // ===== HELPERS =====
+    const $ = (id) => document.getElementById(id);
+
+    const statusToPill = (s) => ({
+      Done: ["done","Виконано"],
+      InProgress: ["progress","У роботі"],
+      NotStarted: ["todo","Не старт"],
+      Blocked: ["blocked","Заблоковано"],
+      Rework: ["rework","Переробка"],
+    }[s] || ["todo","—"]);
+
+    function pickOrderStage(lineItems){
+      // Проста логіка:
+      // 1) якщо є Rework → показуємо Rework current
+      // 2) якщо є InProgress → показуємо current (перший або найчастіший)
+      // 3) якщо все Done → "Завершено"
+      const re = lineItems.find(x=>x.status==="Rework");
+      if(re) return {label: re.current, kind:"rework"};
+
+      const ip = lineItems.filter(x=>x.status==="InProgress");
+      if(ip.length){
+        // якщо кілька — покажемо перший, а у правій панелі напишемо "кілька позицій"
+        return {label: ip[0].current, kind:"progress", multi: ip.length>1, count: ip.length};
+      }
+
+      const bl = lineItems.find(x=>x.status==="Blocked");
+      if(bl) return {label: bl.current || "Очікує", kind:"blocked"};
+
+      const allDone = lineItems.length && lineItems.every(x=>x.status==="Done");
+      if(allDone) return {label:"Завершено", kind:"done"};
+
+      return {label:"Не розпочато", kind:"todo"};
+    }
+
+    function stageStatusFromItems(stageName, lineItems){
+      // Визначаємо статус стадії по items:
+      // - якщо stage == current і статус InProgress → stage InProgress (active)
+      // - якщо stage == current і статус Rework/Blocked → відповідно
+      // - якщо stage == prev для item Done/InProgress → Done
+      // - інакше todo
+      let hasActive = null; // [kind, isActive]
+      let doneCount = 0;
+
+      for(const li of lineItems){
+        if(li.current === stageName){
+          if(li.status === "InProgress") hasActive = ["progress", true];
+          if(li.status === "Rework") hasActive = ["rework", true];
+          if(li.status === "Blocked") hasActive = ["blocked", true];
+        }
+        if(li.prev === stageName){
+          doneCount++;
+        }
+        // якщо item Done і його current у фіналі — попередні стадії теж можемо вважати done
+        // (спрощено: не розгортаємо історію, тому цього досить для візуалу)
+      }
+
+      if(hasActive) return {kind: hasActive[0], active: hasActive[1]};
+      if(doneCount>0) return {kind:"done", active:false};
+      return {kind:"todo", active:false};
+    }
+
+    function render(data){
+      // Header
+      $("orderId").textContent = data.order.external_order_id;
+
+      $("orderMeta").innerHTML = `
+        <span>🗓️ Створено: <b>${data.order.created_at}</b></span>
+        <span>⏳ Дедлайн: <b>${data.order.deadline}</b></span>
+        <span>👤 Клієнт: <b>${data.order.customer}</b></span>
+      `;
+
+      // Sync
+      const sync = data.order.sync_status;
+      let syncTxt="Sync: —", syncCls="pill";
+      if(sync==="OK"){ syncTxt="Sync: OK"; syncCls="pill done"; }
+      if(sync==="WARN"){ syncTxt="Sync: WARN"; syncCls="pill blocked"; }
+      if(sync==="ERROR"){ syncTxt="Sync: ERROR"; syncCls="pill rework"; }
+      $("syncPill").className = syncCls;
+      $("syncPill").textContent = syncTxt;
+
+      // Progress
+      $("orderProgressBar").style.width = `${data.order.progress}%`;
+      $("orderProgressText").textContent = `${data.order.progress}%`;
+
+      // Order current stage
+      const picked = pickOrderStage(data.line_items);
+      $("orderCurrentStage").textContent =
+        picked.multi ? `${picked.label} (у роботі: ${picked.count} позиції)` : picked.label;
+
+      // Overall status pill
+      const overall =
+        data.line_items.some(x=>x.status==="Rework") ? "Rework" :
+        data.line_items.some(x=>x.status==="Blocked") && !data.line_items.some(x=>x.status==="InProgress") ? "Blocked" :
+        data.line_items.some(x=>x.status==="InProgress") ? "InProgress" :
+        data.line_items.every(x=>x.status==="Done") ? "Done" : "NotStarted";
+
+      const [pillClass, pillText] = statusToPill(overall);
+      $("orderStatusPill").className = `pill ${pillClass}`;
+      $("orderStatusPill").textContent = pillText;
+
+      // Timeline
+      const tl = $("timeline");
+      tl.innerHTML = "";
+      data.workflowStages.forEach(stage=>{
+        const st = stageStatusFromItems(stage, data.line_items);
+        const el = document.createElement("div");
+        el.className = `stage ${st.kind} ${st.active ? "active":""}`;
+        el.innerHTML = `
+          <div class="dot" aria-hidden="true"></div>
+          <div>
+            <div class="name">${stage}</div>
+            <div class="sub">${labelByKind(st.kind, st.active)}</div>
+          </div>
+        `;
+        tl.appendChild(el);
+      });
+
+      // Items
+      const itemsWrap = $("items");
+      itemsWrap.innerHTML = "";
+      let done=0, prog=0, todo=0, risk=0;
+
+      data.line_items.forEach(li=>{
+        if(li.status==="Done") done++;
+        if(li.status==="InProgress") prog++;
+        if(li.status==="NotStarted") todo++;
+        if(li.status==="Blocked" || li.status==="Rework") risk++;
+
+        const [cls, txt] = statusToPill(li.status);
+
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <div class="img" title="Attachment / іконка">${li.icon || "🧩"}</div>
+
+          <div>
+            <div class="title">${escapeHtml(li.title)}</div>
+            <div class="desc">
+              <span>SKU: <b>${escapeHtml(li.sku)}</b></span>
+              <span>К-сть: <b>${li.qty}</b></span>
+              <span class="pill ${cls}">${txt}</span>
+            </div>
+            <div class="kv" style="margin-top:8px;">
+              <span><b>Previous:</b> ${escapeHtml(li.prev || "—")}</span>
+              <span><b>Current:</b> ${escapeHtml(li.current || "—")}</span>
+              <span><b>Next:</b> ${escapeHtml(li.next || "—")}</span>
+            </div>
+            ${li.tags?.length ? `<div class="kv" style="margin-top:8px;">
+              ${li.tags.map(t=>`<span class="pill">${escapeHtml(t)}</span>`).join("")}
+            </div>` : ""}
+          </div>
+
+          <div class="right">
+            <div class="muted small">Прогрес</div>
+            <div class="miniBar"><div style="width:${li.percent || 0}%"></div></div>
+            <div class="muted small">${li.percent || 0}%</div>
+          </div>
+        `;
+        itemsWrap.appendChild(item);
+      });
+
+      $("itemsSummary").textContent = `Всього: ${data.line_items.length} • У роботі: ${prog} • Ризики: ${risk}`;
+
+      // Manager panel
+      $("stDone").textContent = done;
+      $("stProg").textContent = prog;
+      $("stTodo").textContent = todo;
+      $("stRisk").textContent = risk;
+
+      const calloutText = makeCallout(data, picked, overall);
+      $("callout").textContent = calloutText.title;
+      $("calloutHint").textContent = calloutText.hint;
+
+      // Risks list
+      const r = $("risks");
+      r.innerHTML = "";
+      const rows = [];
+
+      if(risk===0) rows.push({icon:"✅", text:"Критичних ризиків не виявлено"});
+      if(data.line_items.some(x=>x.status==="Rework")) rows.push({icon:"🔴", text:"Є позиції на переробці (Rework)"});
+      if(data.line_items.some(x=>x.status==="Blocked")) rows.push({icon:"🟠", text:"Є заблоковані позиції (Blocked) — потрібна дія"});
+      if(data.order.sync_status==="WARN") rows.push({icon:"⚠️", text:"Попередження синхронізації (Sync WARN)"});
+      if(data.order.sync_status==="ERROR") rows.push({icon:"❗", text:"Помилка синхронізації (Sync ERROR)"});
+      if(prog>1) rows.push({icon:"ℹ️", text:`Паралельно в роботі ${prog} позиції — не одна стадія`});
+
+      rows.forEach(x=>{
+        const div = document.createElement("div");
+        div.className = "row";
+        div.innerHTML = `<span style="font-size:18px">${x.icon}</span><div><strong>${escapeHtml(x.text)}</strong></div>`;
+        r.appendChild(div);
+      });
+    }
+
+    function labelByKind(kind, active){
+      if(active) return "Активна";
+      if(kind==="done") return "Виконано";
+      if(kind==="progress") return "У роботі";
+      if(kind==="blocked") return "Блок";
+      if(kind==="rework") return "Переробка";
+      return "Очікує";
+    }
+
+    function makeCallout(data, picked, overall){
+      if(overall==="Done"){
+        return {
+          title: `Замовлення завершено ✅`,
+          hint: `Усі позиції виконані. Можна повідомляти клієнта про готовність/відправку.`
+        };
+      }
+      if(overall==="Rework"){
+        return {
+          title: `Є переробка на стадії: ${picked.label}`,
+          hint: `Скажіть клієнту: "На виробництві уточнюємо правки, після цього піде далі по процесу".`
+        };
+      }
+      if(overall==="Blocked"){
+        return {
+          title: `Очікує дію/деталі на стадії: ${picked.label}`,
+          hint: `Скажіть клієнту: "Є затримка через процес/матеріали, уточнюємо термін".`
+        };
+      }
+      return {
+        title: `Зараз на етапі: ${picked.label}`,
+        hint: data.line_items.filter(x=>x.status==="InProgress").length
+          ? `У роботі ${data.line_items.filter(x=>x.status==="InProgress").length} позиція(ї).`
+          : `Очікує старту наступних процесів.`
+      };
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // ===== Search mock =====
+    function searchByExternalId(externalId){
+      // Демо: якщо ввели щось — показуємо DEMO, але підставимо external_order_id
+      const clone = JSON.parse(JSON.stringify(DEMO));
+      clone.order.external_order_id = externalId || DEMO.order.external_order_id;
+      return clone;
+    }
+
+    $("btnSearch").addEventListener("click", ()=>{
+      const id = $("q").value.trim();
+      if(!id){
+        alert("Введіть external_order_id (наприклад O-AW-3918).");
+        return;
+      }
+      render(searchByExternalId(id));
+    });
+
+    $("btnDemo").addEventListener("click", ()=>{
+      $("q").value = DEMO.order.external_order_id;
+      render(DEMO);
+    });
+
+    $("q").addEventListener("keydown",(e)=>{
+      if(e.key==="Enter") $("btnSearch").click();
+    });
+
+    // Автозапуск демо
+    render(DEMO);
+  </script>
+</body>
+</html>
