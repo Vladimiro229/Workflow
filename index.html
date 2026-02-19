@@ -3,207 +3,292 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Workflow — пошук стадії замовлення</title>
+  <title>Hesh — Order Workflow Viewer</title>
 
   <style>
     :root{
-      /* Enterprise / classic */
-      --bg:#f3f4f6;
-      --card:#ffffff;
-      --text:#0b1220;
-      --muted:#5b6474;
-      --line:#e5e7eb;
+      --bg0:#070A12;
+      --bg1:#0B1020;
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.04);
+      --line:rgba(255,255,255,.10);
+      --text:#EAF0FF;
+      --muted:#9AA7C7;
 
-      --shadow:0 8px 22px rgba(2,6,23,.06);
-      --shadow2:0 1px 0 rgba(2,6,23,.04);
+      --shadow: 0 24px 70px rgba(0,0,0,.45);
+      --shadow2: 0 10px 30px rgba(0,0,0,.35);
 
-      --r:12px;      /* main radius */
-      --r2:10px;     /* inner radius */
+      --r:18px;
+      --r2:14px;
 
-      /* Brand */
-      --primary:#1e3a8a;      /* deep blue */
-      --primary2:#0f172a;     /* graphite */
+      --accent:#7C3AED;       /* purple */
+      --accent2:#22D3EE;      /* cyan */
+      --good:#22C55E;
+      --warn:#F59E0B;
+      --bad:#EF4444;
+      --idle:#94A3B8;
 
-      /* Status */
-      --done:#16a34a;
-      --progress:#2563eb;
-      --paused:#d97706;
-      --blocked:#dc2626;
-      --canceled:#64748b;
+      --focus: 0 0 0 3px rgba(124,58,237,.20), 0 0 0 1px rgba(34,211,238,.18);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --ui: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans";
     }
 
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{
       margin:0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans";
-      background:var(--bg);
+      font-family:var(--ui);
       color:var(--text);
-      letter-spacing:.1px;
+      background:
+        radial-gradient(1200px 700px at 70% -10%, rgba(124,58,237,.35), transparent 60%),
+        radial-gradient(900px 600px at 10% 10%, rgba(34,211,238,.22), transparent 55%),
+        radial-gradient(900px 700px at 80% 110%, rgba(34,197,94,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
     }
-    .wrap{max-width:1120px;margin:22px auto;padding:0 16px 52px}
 
-    /* Search */
-    .searchRow{display:flex;gap:10px;align-items:center;margin-bottom:14px}
-    .searchBox{
-      flex:1;
+    /* subtle grid */
+    .gridbg:before{
+      content:"";
+      position:fixed; inset:0;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity:.18;
+      pointer-events:none;
+      mask-image: radial-gradient(closest-side at 50% 35%, black 0%, transparent 70%);
+    }
+
+    .wrap{max-width:1180px;margin:0 auto;padding:22px 16px 56px}
+
+    /* Topbar */
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:14px;margin-bottom:18px;
+    }
+    .brand{
       display:flex;align-items:center;gap:10px;
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:999px;
-      padding:12px 14px;
-      box-shadow: var(--shadow2);
+      font-weight:900;letter-spacing:.3px;
     }
-    .searchBox span{color:var(--muted)}
-    .searchBox input{
-      border:0;outline:0;background:transparent;width:100%;
-      font-size:14px;
+    .logo{
+      width:34px;height:34px;border-radius:12px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(34,211,238,.9), transparent 55%),
+        radial-gradient(circle at 70% 70%, rgba(124,58,237,.9), transparent 55%),
+        rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
     }
-
-    .btn{
-      border:1px solid rgba(2,6,23,.08);
-      padding:12px 16px;
-      border-radius:999px;
-      background: var(--primary2);
-      color:#fff;
-      font-weight:800;
-      cursor:pointer;
-      box-shadow: var(--shadow2);
-      white-space:nowrap;
-    }
-    .btn:hover{filter:brightness(1.05)}
-    .btn:active{transform:translateY(1px)}
-    .btn.ghost{
-      background:#fff;
-      color:var(--primary2);
-      border:1px solid var(--line);
+    .brand small{display:block;color:var(--muted);font-weight:700;letter-spacing:.2px}
+    .rightTools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .chip{
+      padding:8px 10px;border-radius:999px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--muted);
+      font-weight:800;font-size:12px;
+      font-family:var(--mono);
     }
 
     /* Cards */
     .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius: var(--r);
-      box-shadow: var(--shadow);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(12px);
     }
-    .cardBd{padding:16px}
+    .cardBd{padding:18px}
+
+    /* Search row */
+    .searchRow{
+      display:flex;gap:10px;align-items:center;
+      margin-bottom:14px;
+    }
+    .searchBox{
+      flex:1; display:flex; align-items:center; gap:10px;
+      padding:12px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow2);
+    }
+    .searchBox span{color:rgba(234,240,255,.85)}
+    .searchBox input{
+      width:100%;
+      border:0; outline:0;
+      background:transparent;
+      color:var(--text);
+      font-size:14px;
+      letter-spacing:.15px;
+    }
+    .searchBox input::placeholder{color:rgba(154,167,199,.75)}
+    .searchBox:focus-within{box-shadow:var(--shadow2), var(--focus); border-color:rgba(124,58,237,.35)}
+
+    .btn{
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:999px;
+      padding:12px 14px;
+      font-weight:900;
+      cursor:pointer;
+      color:var(--text);
+      background:
+        radial-gradient(120% 160% at 20% 0%, rgba(34,211,238,.22), transparent 50%),
+        radial-gradient(120% 160% at 80% 100%, rgba(124,58,237,.30), transparent 55%),
+        rgba(255,255,255,.06);
+      box-shadow: var(--shadow2);
+      transition: transform .08s ease, filter .12s ease;
+      white-space:nowrap;
+    }
+    .btn:hover{filter:brightness(1.06)}
+    .btn:active{transform:translateY(1px)}
+    .btn.ghost{
+      background: rgba(255,255,255,.04);
+      color: rgba(234,240,255,.92);
+    }
 
     /* Order header */
-    .orderTitle{
-      font-weight:900;
-      font-size:18px;
-      letter-spacing:.2px;
+    .orderHead{
+      display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+      align-items:flex-start;
+    }
+    .orderId{
+      font-size:22px;font-weight:1000;letter-spacing:.3px;
+      font-family:var(--mono);
     }
     .meta{
       display:flex;flex-wrap:wrap;gap:12px;
-      color:var(--muted);
-      font-size:13px;
-      margin-top:8px;
+      color:var(--muted);font-size:13px;margin-top:8px;
     }
-    .meta b{color:var(--text);font-weight:800}
+    .meta b{color:var(--text);font-weight:900}
 
-    .progressRow{display:flex;align-items:center;gap:12px;margin-top:14px}
-    .pill{
-      font-size:12px;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:#f8fafc;
-      color:var(--muted);
-      font-weight:800;
+    .syncPill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:999px;
+      background:rgba(34,197,94,.10);
+      border:1px solid rgba(34,197,94,.20);
+      color:#BFF7D0;
+      font-weight:900;font-size:12px;
       white-space:nowrap;
     }
-    .pill.ok{
-      background: rgba(22,163,74,.08);
-      border-color: rgba(22,163,74,.18);
-      color: #166534;
+    .syncDot{
+      width:8px;height:8px;border-radius:999px;background:var(--good);
+      box-shadow:0 0 0 4px rgba(34,197,94,.12);
     }
 
+    .progressRow{display:flex;align-items:center;gap:12px;margin-top:14px}
     .bar{
       flex:1;height:10px;border-radius:999px;overflow:hidden;
-      background:#eef2ff;
-      border:1px solid #e5e7eb;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.10);
     }
     .bar>div{
-      height:100%;
-      width:0%;
+      height:100%;width:0%;
       border-radius:999px;
-      background: var(--primary);
-      transition: width .35s ease;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition:width .35s ease;
+      box-shadow:0 0 30px rgba(124,58,237,.25);
     }
-    .pct{font-size:12px;color:var(--muted);font-weight:900;min-width:42px;text-align:right}
+    .pct{font-size:12px;color:rgba(154,167,199,.9);font-weight:900;min-width:44px;text-align:right}
 
-    /* Section */
     .sectionTitle{
-      font-weight:900;
       margin:18px 0 10px;
       display:flex;justify-content:space-between;align-items:end;gap:10px;
+      font-weight:1000;
+      letter-spacing:.2px;
     }
-    .sectionTitle small{color:var(--muted);font-weight:800}
+    .sectionTitle small{
+      color:rgba(154,167,199,.92);
+      font-weight:900;
+      font-family:var(--mono);
+    }
 
     /* Items */
     .items{display:flex;flex-direction:column;gap:10px}
     .item{
       display:grid;
-      grid-template-columns:56px 1fr 240px;
+      grid-template-columns:58px 1fr 250px;
       gap:12px;
       padding:14px;
-      border:1px solid var(--line);
-      border-radius: var(--r);
-      background:#fff;
-      align-items:center;
+      border-radius:var(--r2);
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 10px 24px rgba(0,0,0,.24);
       cursor:pointer;
-      transition: box-shadow .12s ease, border-color .12s ease, transform .08s ease;
+      transition: transform .10s ease, border-color .12s ease, filter .12s ease;
     }
     .item:hover{
-      border-color: rgba(30,58,138,.22);
-      box-shadow: 0 10px 24px rgba(2,6,23,.08);
-      transform: translateY(-1px);
+      transform:translateY(-1px);
+      border-color: rgba(34,211,238,.22);
+      filter:brightness(1.03);
     }
 
     .ico{
-      width:56px;height:56px;
-      border-radius: 14px;
-      border:1px solid var(--line);
+      width:58px;height:58px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(circle at 30% 20%, rgba(34,211,238,.18), transparent 55%),
+        radial-gradient(circle at 70% 80%, rgba(124,58,237,.22), transparent 55%),
+        rgba(255,255,255,.04);
       display:grid;place-items:center;
-      background:#f8fafc;
       font-size:22px;
     }
 
-    .itTitle{font-weight:900;font-size:14px;margin:0 0 5px}
+    .itTitle{font-weight:1000;font-size:14px;margin:0 0 6px}
     .itMeta{
       display:flex;flex-wrap:wrap;gap:10px;
-      color:var(--muted);
+      color:rgba(154,167,199,.90);
       font-size:12px;
     }
-    .itMeta b{color:var(--text);font-weight:800}
+    .itMeta b{color:rgba(234,240,255,.95);font-weight:900}
+    .itMeta .mono{font-family:var(--mono)}
+    .rowTop{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 
-    /* Status pills */
-    .statusPill{margin-left:8px}
-    .statusPill.done{background:rgba(22,163,74,.10);border-color:rgba(22,163,74,.18);color:#166534}
-    .statusPill.progress{background:rgba(37,99,235,.10);border-color:rgba(37,99,235,.18);color:#1d4ed8}
-    .statusPill.paused{background:rgba(217,119,6,.10);border-color:rgba(217,119,6,.20);color:#92400e}
-    .statusPill.blocked{background:rgba(220,38,38,.10);border-color:rgba(220,38,38,.18);color:#991b1b}
-    .statusPill.canceled{background:rgba(100,116,139,.10);border-color:rgba(100,116,139,.18);color:#334155}
+    .pill{
+      font-size:12px;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      color:rgba(234,240,255,.92);
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .pill.done{background:rgba(34,197,94,.10);border-color:rgba(34,197,94,.18);color:#BFF7D0}
+    .pill.progress{background:rgba(37,99,235,.12);border-color:rgba(37,99,235,.20);color:#CFE1FF}
+    .pill.paused{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.20);color:#FFE3B2}
+    .pill.blocked{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.20);color:#FFD0D0}
+    .pill.canceled{background:rgba(148,163,184,.10);border-color:rgba(148,163,184,.18);color:#DDE6F6}
 
     .right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
     .miniBar{
-      width:200px;height:8px;border-radius:999px;
-      background:#f1f5f9;border:1px solid var(--line);
-      overflow:hidden;
+      width:210px;height:9px;border-radius:999px;overflow:hidden;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.10);
     }
     .miniBar>div{
-      height:100%;
-      width:0%;
+      height:100%;width:0%;
       border-radius:999px;
-      background: var(--done);
+      background: linear-gradient(90deg, rgba(34,197,94,.95), rgba(34,211,238,.85));
       transition: width .35s ease;
+      box-shadow:0 0 24px rgba(34,211,238,.18);
     }
-    .miniPct{font-size:12px;color:var(--muted);font-weight:900}
+    .miniPct{font-size:12px;color:rgba(154,167,199,.92);font-weight:1000;font-family:var(--mono)}
+
+    .empty{
+      padding:18px;
+      text-align:center;
+      color:rgba(154,167,199,.92);
+      background:rgba(255,255,255,.03);
+      border:1px dashed rgba(255,255,255,.14);
+      border-radius:var(--r2);
+    }
 
     /* Drawer */
     .overlay{
-      position:fixed;inset:0;
-      background: rgba(2,6,23,.55);
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.58);
       display:none;
       align-items:stretch;
       justify-content:flex-end;
@@ -211,91 +296,112 @@
     }
     .overlay.show{display:flex}
     .drawer{
-      width:min(560px,100%);
+      width:min(600px,100%);
       height:100%;
-      background:#fff;
-      border-left:1px solid var(--line);
-      box-shadow: -18px 0 36px rgba(2,6,23,.18);
+      background:
+        radial-gradient(900px 500px at 20% 0%, rgba(34,211,238,.12), transparent 60%),
+        radial-gradient(800px 500px at 90% 20%, rgba(124,58,237,.14), transparent 60%),
+        linear-gradient(180deg, rgba(16,18,32,.98), rgba(10,12,22,.98));
+      border-left:1px solid rgba(255,255,255,.10);
+      box-shadow: -24px 0 60px rgba(0,0,0,.55);
       padding:16px;
       display:flex;
       flex-direction:column;
       gap:12px;
+      backdrop-filter: blur(14px);
     }
     .drawerTop{
-      display:flex;align-items:flex-start;justify-content:space-between;gap:10px;
-      padding-bottom:10px;border-bottom:1px solid var(--line);
+      display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+      padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.10);
     }
-    .drawerTitle{font-weight:900;font-size:16px;margin:0}
+    .drawerTitle{
+      margin:0;
+      font-weight:1000;
+      font-size:16px;
+      letter-spacing:.2px;
+    }
     .close{
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius: 10px;
-      padding:8px 10px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      color:rgba(234,240,255,.95);
+      border-radius:12px;
+      padding:9px 11px;
       cursor:pointer;
-      font-weight:900;
-      color:var(--primary2);
+      font-weight:1000;
     }
-    .close:hover{background:#f8fafc}
-
+    .close:hover{filter:brightness(1.08)}
     .drawerInfo{
       display:flex;flex-wrap:wrap;gap:10px;
-      color:var(--muted);font-size:12px;
+      color:rgba(154,167,199,.92);
+      font-size:12px;
     }
-    .drawerInfo b{color:var(--text);font-weight:800}
+    .drawerInfo b{color:rgba(234,240,255,.95);font-weight:1000}
+    .drawerInfo .mono{font-family:var(--mono)}
 
-    /* Tasks */
-    .tasks{display:flex;flex-direction:column;gap:10px;overflow:auto;padding-right:4px}
+    .tasks{
+      display:flex;flex-direction:column;gap:10px;
+      overflow:auto;
+      padding-right:4px;
+    }
     .task{
-      border:1px solid var(--line);
-      border-radius: var(--r2);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:var(--r2);
       padding:12px;
-      display:flex;
-      gap:12px;
-      align-items:flex-start;
-      background:#fff;
+      background:rgba(255,255,255,.04);
+      display:flex;gap:12px;align-items:flex-start;
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
     }
     .dot{
       width:10px;height:10px;border-radius:999px;margin-top:4px;
-      background: var(--canceled);
+      background:var(--idle);
+      box-shadow:0 0 0 4px rgba(148,163,184,.10);
       flex:0 0 auto;
     }
-    .dot.done{background:var(--done)}
-    .dot.progress{background:var(--progress)}
-    .dot.paused{background:var(--paused)}
-    .dot.blocked{background:var(--blocked)}
-    .dot.canceled{background:var(--canceled)}
+    .dot.done{background:var(--good); box-shadow:0 0 0 4px rgba(34,197,94,.12)}
+    .dot.progress{background:var(--accent2); box-shadow:0 0 0 4px rgba(34,211,238,.12)}
+    .dot.paused{background:var(--warn); box-shadow:0 0 0 4px rgba(245,158,11,.12)}
+    .dot.blocked{background:var(--bad); box-shadow:0 0 0 4px rgba(239,68,68,.12)}
+    .dot.canceled{background:var(--idle); box-shadow:0 0 0 4px rgba(148,163,184,.10)}
 
     .taskMain{flex:1}
-    .taskName{font-weight:900;font-size:13px;margin:0 0 4px}
-    .taskSub{color:var(--muted);font-size:12px;margin:0}
-    .taskRight{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-    .taskPill{
-      font-size:12px;padding:6px 10px;border-radius:999px;
-      border:1px solid var(--line);
-      font-weight:900;
-      background:#f8fafc;
+    .taskName{margin:0 0 5px;font-weight:1000;font-size:13px}
+    .taskSub{margin:0;color:rgba(154,167,199,.90);font-size:12px}
+    .taskRight{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+    .taskTime{
+      font-size:12px;
+      color:rgba(154,167,199,.92);
+      font-weight:1000;
+      font-family:var(--mono);
     }
-    .taskPill.done{background:rgba(22,163,74,.10);border-color:rgba(22,163,74,.18);color:#166534}
-    .taskPill.progress{background:rgba(37,99,235,.10);border-color:rgba(37,99,235,.18);color:#1d4ed8}
-    .taskPill.paused{background:rgba(217,119,6,.10);border-color:rgba(217,119,6,.20);color:#92400e}
-    .taskPill.blocked{background:rgba(220,38,38,.10);border-color:rgba(220,38,38,.18);color:#991b1b}
-    .taskPill.canceled{background:rgba(100,116,139,.10);border-color:rgba(100,116,139,.18);color:#334155}
 
-    .taskTime{font-size:12px;color:var(--muted);font-weight:900}
-
-    .empty{
-      padding:18px;
-      color:var(--muted);
-      text-align:center;
-      border:1px dashed var(--line);
-      border-radius: var(--r);
-      background:#fbfbfc;
+    /* Responsive */
+    @media (max-width: 920px){
+      .item{grid-template-columns:58px 1fr; }
+      .right{align-items:flex-start}
+      .miniBar{width:100%}
     }
   </style>
 </head>
 
-<body>
+<body class="gridbg">
   <div class="wrap">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          Hesh Workflow
+          <small>Order status lookup for managers</small>
+        </div>
+      </div>
+
+      <div class="rightTools">
+        <span class="chip">UI: demo</span>
+        <span class="chip">Theme: crypto</span>
+      </div>
+    </div>
+
     <!-- SEARCH -->
     <div class="searchRow">
       <div class="searchBox">
@@ -306,14 +412,23 @@
       <button class="btn ghost" id="btnDemo" title="Показати демо">Демо</button>
     </div>
 
-    <!-- ORDER HEADER -->
+    <!-- ORDER CARD -->
     <div class="card" id="orderCard">
       <div class="cardBd">
-        <div class="orderTitle" id="orderId">—</div>
-        <div class="meta" id="orderMeta"></div>
+
+        <div class="orderHead">
+          <div>
+            <div class="orderId" id="orderId">—</div>
+            <div class="meta" id="orderMeta"></div>
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+            <span class="syncPill" id="syncPill"><span class="syncDot"></span> Sync: OK</span>
+            <span class="chip" id="orderTag">external_order_id</span>
+          </div>
+        </div>
 
         <div class="progressRow">
-          <span class="pill ok" id="syncPill">Sync: OK</span>
           <div class="bar"><div id="orderBar"></div></div>
           <div class="pct" id="orderPct">—%</div>
         </div>
@@ -347,7 +462,6 @@
 
   <script>
     // ===== DEMO (поки без API) =====
-    // Додано: changed_at для задач (час зміни статусу)
     const DEMO = {
       order: {
         external_order_id: "O-AW-3918",
@@ -364,7 +478,7 @@
           title:"Коробочка тактична 1010 — індивідуальний дизайн",
           sku:"1010 Зелена",
           qty:1,
-          status:"Done", // Done | InProgress | Paused | Blocked | Canceled
+          status:"Done",
           percent:100,
           current:"Відправка товару",
           next:"—",
@@ -397,7 +511,7 @@
             { name:"Друк на плівці", status:"Done", changed_at:"21.02.2026 10:40" },
             { name:"Вирізання циферблата", status:"Done", changed_at:"21.02.2026 11:50" },
             { name:"Збірка циферблата", status:"InProgress", changed_at:"21.02.2026 12:15" },
-            { name:"Контроль якості циферблата", status:"Canceled", changed_at:"—", note:"Ще не запускали" },
+            { name:"Контроль якості циферблата", status:"Paused", changed_at:"21.02.2026 14:02", note:"Очікує деталі" },
             { name:"Збірка годинника", status:"Canceled", changed_at:"—", note:"Ще не запускали" },
             { name:"Нанесення гравіювання", status:"Canceled", changed_at:"—", note:"Ще не запускали" },
             { name:"Контроль якості годинника", status:"Canceled", changed_at:"—", note:"Ще не запускали" },
@@ -409,6 +523,15 @@
 
     const $ = (id) => document.getElementById(id);
 
+    function esc(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
     function statusLabel(s){
       return ({
         Done:"Виконано",
@@ -418,6 +541,7 @@
         Canceled:"Скасовано"
       }[s] || "—");
     }
+
     function statusClass(s){
       return ({
         Done:"done",
@@ -426,14 +550,6 @@
         Blocked:"blocked",
         Canceled:"canceled"
       }[s] || "canceled");
-    }
-    function esc(s){
-      return String(s ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
     }
 
     function latestChangedAt(tasks){
@@ -450,7 +566,9 @@
         <span>👤 Клієнт: <b>${esc(data.order.customer)}</b></span>
       `;
 
-      $("syncPill").textContent = `Sync: ${esc(data.order.sync_status)}`;
+      $("syncPill").innerHTML = `<span class="syncDot"></span> Sync: ${esc(data.order.sync_status)}`;
+      $("orderTag").textContent = "external_order_id";
+
       $("orderBar").style.width = `${Number(data.order.progress||0)}%`;
       $("orderPct").textContent = `${Number(data.order.progress||0)}%`;
 
@@ -458,8 +576,7 @@
       const inWork = data.line_items.filter(x=>x.status==="InProgress").length;
       const risks = data.line_items.filter(x=>x.status==="Blocked").length;
 
-      // ✅ Явно показуємо кількість позицій
-      $("itemsSummary").textContent = `Позицій: ${total} • У роботі: ${inWork} • Ризики: ${risks}`;
+      $("itemsSummary").textContent = `Позицій: ${total} · У роботі: ${inWork} · Ризики: ${risks}`;
 
       const wrap = $("items");
       wrap.innerHTML = "";
@@ -477,19 +594,22 @@
         div.className = "item";
         div.innerHTML = `
           <div class="ico">${esc(li.icon || "🧩")}</div>
+
           <div>
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div class="rowTop">
               <p class="itTitle">${esc(li.title)}</p>
-              <span class="pill statusPill ${stCls}">${statusLabel(li.status)}</span>
+              <span class="pill ${stCls}">${statusLabel(li.status)}</span>
             </div>
+
             <div class="itMeta">
               <span>SKU: <b>${esc(li.sku)}</b></span>
               <span>К-сть: <b>${Number(li.qty||0)}</b></span>
               <span>Current: <b>${esc(li.current || "—")}</b></span>
               <span>Next: <b>${esc(li.next || "—")}</b></span>
-              <span>Оновлено: <b>${esc(updated)}</b></span>
+              <span class="mono">Оновлено: <b>${esc(updated)}</b></span>
             </div>
           </div>
+
           <div class="right">
             <div class="miniBar"><div style="width:${Number(li.percent||0)}%"></div></div>
             <div class="miniPct">${Number(li.percent||0)}%</div>
@@ -507,13 +627,14 @@
       $("drawerTitle").textContent = li.title;
 
       const updated = latestChangedAt(li.tasks);
+      const stCls = statusClass(li.status);
 
       $("drawerInfo").innerHTML = `
-        <span>ID: <b>${esc(li.id)}</b></span>
+        <span class="mono">ID: <b>${esc(li.id)}</b></span>
         <span>SKU: <b>${esc(li.sku)}</b></span>
         <span>К-сть: <b>${Number(li.qty||0)}</b></span>
-        <span>Оновлено: <b>${esc(updated)}</b></span>
-        <span class="pill ${statusClass(li.status)}">${statusLabel(li.status)}</span>
+        <span class="mono">Оновлено: <b>${esc(updated)}</b></span>
+        <span class="pill ${stCls}">${statusLabel(li.status)}</span>
       `;
 
       $("drawerCurrent").innerHTML = `
@@ -535,7 +656,7 @@
             <p class="taskSub">${t.note ? esc(t.note) : "—"}</p>
           </div>
           <div class="taskRight">
-            <span class="taskPill ${cls}">${statusLabel(t.status)}</span>
+            <span class="pill ${cls}">${statusLabel(t.status)}</span>
             <span class="taskTime">Оновлено: ${esc(t.changed_at || "—")}</span>
           </div>
         `;
@@ -575,7 +696,6 @@
     $("overlay").addEventListener("click",(e)=>{ if(e.target === $("overlay")) closeDetails(); });
     window.addEventListener("keydown",(e)=>{ if(e.key==="Escape") closeDetails(); });
 
-    // старт демо
     render(DEMO);
   </script>
 </body>
