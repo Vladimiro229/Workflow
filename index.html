@@ -1,287 +1,582 @@
-<style>
-  :root{
-    /* Enterprise / classic */
-    --bg:#f3f4f6;
-    --card:#ffffff;
-    --text:#0b1220;
-    --muted:#5b6474;
-    --line:#e5e7eb;
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Workflow — пошук стадії замовлення</title>
 
-    --shadow:0 8px 22px rgba(2,6,23,.06);
-    --shadow2:0 1px 0 rgba(2,6,23,.04);
+  <style>
+    :root{
+      /* Enterprise / classic */
+      --bg:#f3f4f6;
+      --card:#ffffff;
+      --text:#0b1220;
+      --muted:#5b6474;
+      --line:#e5e7eb;
 
-    --r:12px;      /* main radius */
-    --r2:10px;     /* inner radius */
+      --shadow:0 8px 22px rgba(2,6,23,.06);
+      --shadow2:0 1px 0 rgba(2,6,23,.04);
 
-    /* Brand */
-    --primary:#1e3a8a;      /* deep blue */
-    --primary2:#0f172a;     /* graphite */
-    --primarySoft:#e8eefc;
+      --r:12px;      /* main radius */
+      --r2:10px;     /* inner radius */
 
-    /* Status */
-    --done:#16a34a;
-    --progress:#2563eb;
-    --paused:#d97706;
-    --blocked:#dc2626;
-    --canceled:#64748b;
-  }
+      /* Brand */
+      --primary:#1e3a8a;      /* deep blue */
+      --primary2:#0f172a;     /* graphite */
 
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans";
-    background:var(--bg);
-    color:var(--text);
-    letter-spacing:.1px;
-  }
-  .wrap{max-width:1120px;margin:22px auto;padding:0 16px 52px}
+      /* Status */
+      --done:#16a34a;
+      --progress:#2563eb;
+      --paused:#d97706;
+      --blocked:#dc2626;
+      --canceled:#64748b;
+    }
 
-  /* Search */
-  .searchRow{display:flex;gap:10px;align-items:center;margin-bottom:14px}
-  .searchBox{
-    flex:1;
-    display:flex;align-items:center;gap:10px;
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:999px;
-    padding:12px 14px;
-    box-shadow: var(--shadow2);
-  }
-  .searchBox span{color:var(--muted)}
-  .searchBox input{
-    border:0;outline:0;background:transparent;width:100%;
-    font-size:14px;
-  }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans";
+      background:var(--bg);
+      color:var(--text);
+      letter-spacing:.1px;
+    }
+    .wrap{max-width:1120px;margin:22px auto;padding:0 16px 52px}
 
-  .btn{
-    border:1px solid rgba(2,6,23,.08);
-    padding:12px 16px;
-    border-radius:999px;
-    background: var(--primary2);
-    color:#fff;
-    font-weight:800;
-    cursor:pointer;
-    box-shadow: var(--shadow2);
-  }
-  .btn:hover{filter:brightness(1.05)}
-  .btn:active{transform:translateY(1px)}
-  .btn.ghost{
-    background:#fff;
-    color:var(--primary2);
-    border:1px solid var(--line);
-  }
+    /* Search */
+    .searchRow{display:flex;gap:10px;align-items:center;margin-bottom:14px}
+    .searchBox{
+      flex:1;
+      display:flex;align-items:center;gap:10px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:12px 14px;
+      box-shadow: var(--shadow2);
+    }
+    .searchBox span{color:var(--muted)}
+    .searchBox input{
+      border:0;outline:0;background:transparent;width:100%;
+      font-size:14px;
+    }
 
-  /* Cards */
-  .card{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius: var(--r);
-    box-shadow: var(--shadow);
-  }
-  .cardBd{padding:16px}
+    .btn{
+      border:1px solid rgba(2,6,23,.08);
+      padding:12px 16px;
+      border-radius:999px;
+      background: var(--primary2);
+      color:#fff;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow: var(--shadow2);
+      white-space:nowrap;
+    }
+    .btn:hover{filter:brightness(1.05)}
+    .btn:active{transform:translateY(1px)}
+    .btn.ghost{
+      background:#fff;
+      color:var(--primary2);
+      border:1px solid var(--line);
+    }
 
-  /* Order header */
-  .orderTitle{
-    font-weight:900;
-    font-size:18px;
-    letter-spacing:.2px;
-  }
-  .meta{
-    display:flex;flex-wrap:wrap;gap:12px;
-    color:var(--muted);
-    font-size:13px;
-    margin-top:8px;
-  }
-  .meta b{color:var(--text);font-weight:800}
+    /* Cards */
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+    }
+    .cardBd{padding:16px}
 
-  .progressRow{display:flex;align-items:center;gap:12px;margin-top:14px}
-  .pill{
-    font-size:12px;
-    padding:6px 10px;
-    border-radius:999px;
-    border:1px solid var(--line);
-    background:#f8fafc;
-    color:var(--muted);
-    font-weight:800;
-    white-space:nowrap;
-  }
-  .pill.ok{
-    background: rgba(22,163,74,.08);
-    border-color: rgba(22,163,74,.18);
-    color: #166534;
-  }
+    /* Order header */
+    .orderTitle{
+      font-weight:900;
+      font-size:18px;
+      letter-spacing:.2px;
+    }
+    .meta{
+      display:flex;flex-wrap:wrap;gap:12px;
+      color:var(--muted);
+      font-size:13px;
+      margin-top:8px;
+    }
+    .meta b{color:var(--text);font-weight:800}
 
-  .bar{
-    flex:1;height:10px;border-radius:999px;overflow:hidden;
-    background:#eef2ff;
-    border:1px solid #e5e7eb;
-  }
-  .bar>div{
-    height:100%;
-    width:0%;
-    border-radius:999px;
-    background: var(--primary);
-    transition: width .35s ease;
-  }
-  .pct{font-size:12px;color:var(--muted);font-weight:900;min-width:42px;text-align:right}
+    .progressRow{display:flex;align-items:center;gap:12px;margin-top:14px}
+    .pill{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#f8fafc;
+      color:var(--muted);
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .pill.ok{
+      background: rgba(22,163,74,.08);
+      border-color: rgba(22,163,74,.18);
+      color: #166534;
+    }
 
-  /* Section */
-  .sectionTitle{
-    font-weight:900;
-    margin:18px 0 10px;
-    display:flex;justify-content:space-between;align-items:end;gap:10px;
-  }
-  .sectionTitle small{color:var(--muted);font-weight:800}
+    .bar{
+      flex:1;height:10px;border-radius:999px;overflow:hidden;
+      background:#eef2ff;
+      border:1px solid #e5e7eb;
+    }
+    .bar>div{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background: var(--primary);
+      transition: width .35s ease;
+    }
+    .pct{font-size:12px;color:var(--muted);font-weight:900;min-width:42px;text-align:right}
 
-  /* Items */
-  .items{display:flex;flex-direction:column;gap:10px}
-  .item{
-    display:grid;
-    grid-template-columns:56px 1fr 240px;
-    gap:12px;
-    padding:14px;
-    border:1px solid var(--line);
-    border-radius: var(--r);
-    background:#fff;
-    align-items:center;
-    cursor:pointer;
-    transition: box-shadow .12s ease, border-color .12s ease, transform .08s ease;
-  }
-  .item:hover{
-    border-color: rgba(30,58,138,.22);
-    box-shadow: 0 10px 24px rgba(2,6,23,.08);
-    transform: translateY(-1px);
-  }
+    /* Section */
+    .sectionTitle{
+      font-weight:900;
+      margin:18px 0 10px;
+      display:flex;justify-content:space-between;align-items:end;gap:10px;
+    }
+    .sectionTitle small{color:var(--muted);font-weight:800}
 
-  .ico{
-    width:56px;height:56px;
-    border-radius: 14px;
-    border:1px solid var(--line);
-    display:grid;place-items:center;
-    background:#f8fafc;
-    font-size:22px;
-  }
+    /* Items */
+    .items{display:flex;flex-direction:column;gap:10px}
+    .item{
+      display:grid;
+      grid-template-columns:56px 1fr 240px;
+      gap:12px;
+      padding:14px;
+      border:1px solid var(--line);
+      border-radius: var(--r);
+      background:#fff;
+      align-items:center;
+      cursor:pointer;
+      transition: box-shadow .12s ease, border-color .12s ease, transform .08s ease;
+    }
+    .item:hover{
+      border-color: rgba(30,58,138,.22);
+      box-shadow: 0 10px 24px rgba(2,6,23,.08);
+      transform: translateY(-1px);
+    }
 
-  .itTitle{font-weight:900;font-size:14px;margin:0 0 5px}
-  .itMeta{
-    display:flex;flex-wrap:wrap;gap:10px;
-    color:var(--muted);
-    font-size:12px;
-  }
-  .itMeta b{color:var(--text);font-weight:800}
+    .ico{
+      width:56px;height:56px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      display:grid;place-items:center;
+      background:#f8fafc;
+      font-size:22px;
+    }
 
-  /* Status pills */
-  .statusPill{margin-left:8px}
-  .statusPill.done{background:rgba(22,163,74,.10);border-color:rgba(22,163,74,.18);color:#166534}
-  .statusPill.progress{background:rgba(37,99,235,.10);border-color:rgba(37,99,235,.18);color:#1d4ed8}
-  .statusPill.paused{background:rgba(217,119,6,.10);border-color:rgba(217,119,6,.20);color:#92400e}
-  .statusPill.blocked{background:rgba(220,38,38,.10);border-color:rgba(220,38,38,.18);color:#991b1b}
-  .statusPill.canceled{background:rgba(100,116,139,.10);border-color:rgba(100,116,139,.18);color:#334155}
+    .itTitle{font-weight:900;font-size:14px;margin:0 0 5px}
+    .itMeta{
+      display:flex;flex-wrap:wrap;gap:10px;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .itMeta b{color:var(--text);font-weight:800}
 
-  .right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-  .miniBar{
-    width:200px;height:8px;border-radius:999px;
-    background:#f1f5f9;border:1px solid var(--line);
-    overflow:hidden;
-  }
-  .miniBar>div{
-    height:100%;
-    width:0%;
-    border-radius:999px;
-    background: var(--done);
-    transition: width .35s ease;
-  }
-  .miniPct{font-size:12px;color:var(--muted);font-weight:900}
+    /* Status pills */
+    .statusPill{margin-left:8px}
+    .statusPill.done{background:rgba(22,163,74,.10);border-color:rgba(22,163,74,.18);color:#166534}
+    .statusPill.progress{background:rgba(37,99,235,.10);border-color:rgba(37,99,235,.18);color:#1d4ed8}
+    .statusPill.paused{background:rgba(217,119,6,.10);border-color:rgba(217,119,6,.20);color:#92400e}
+    .statusPill.blocked{background:rgba(220,38,38,.10);border-color:rgba(220,38,38,.18);color:#991b1b}
+    .statusPill.canceled{background:rgba(100,116,139,.10);border-color:rgba(100,116,139,.18);color:#334155}
 
-  /* Drawer */
-  .overlay{
-    position:fixed;inset:0;
-    background: rgba(2,6,23,.55);
-    display:none;
-    align-items:stretch;
-    justify-content:flex-end;
-    z-index:50;
-  }
-  .overlay.show{display:flex}
-  .drawer{
-    width:min(560px,100%);
-    height:100%;
-    background:#fff;
-    border-left:1px solid var(--line);
-    box-shadow: -18px 0 36px rgba(2,6,23,.18);
-    padding:16px;
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-  }
-  .drawerTop{
-    display:flex;align-items:flex-start;justify-content:space-between;gap:10px;
-    padding-bottom:10px;border-bottom:1px solid var(--line);
-  }
-  .drawerTitle{font-weight:900;font-size:16px;margin:0}
-  .close{
-    border:1px solid var(--line);
-    background:#fff;
-    border-radius: 10px;
-    padding:8px 10px;
-    cursor:pointer;
-    font-weight:900;
-    color:var(--primary2);
-  }
-  .close:hover{background:#f8fafc}
+    .right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+    .miniBar{
+      width:200px;height:8px;border-radius:999px;
+      background:#f1f5f9;border:1px solid var(--line);
+      overflow:hidden;
+    }
+    .miniBar>div{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background: var(--done);
+      transition: width .35s ease;
+    }
+    .miniPct{font-size:12px;color:var(--muted);font-weight:900}
 
-  .drawerInfo{
-    display:flex;flex-wrap:wrap;gap:10px;
-    color:var(--muted);font-size:12px;
-  }
-  .drawerInfo b{color:var(--text);font-weight:800}
+    /* Drawer */
+    .overlay{
+      position:fixed;inset:0;
+      background: rgba(2,6,23,.55);
+      display:none;
+      align-items:stretch;
+      justify-content:flex-end;
+      z-index:50;
+    }
+    .overlay.show{display:flex}
+    .drawer{
+      width:min(560px,100%);
+      height:100%;
+      background:#fff;
+      border-left:1px solid var(--line);
+      box-shadow: -18px 0 36px rgba(2,6,23,.18);
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .drawerTop{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:10px;
+      padding-bottom:10px;border-bottom:1px solid var(--line);
+    }
+    .drawerTitle{font-weight:900;font-size:16px;margin:0}
+    .close{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius: 10px;
+      padding:8px 10px;
+      cursor:pointer;
+      font-weight:900;
+      color:var(--primary2);
+    }
+    .close:hover{background:#f8fafc}
 
-  /* Tasks */
-  .tasks{display:flex;flex-direction:column;gap:10px;overflow:auto;padding-right:4px}
-  .task{
-    border:1px solid var(--line);
-    border-radius: var(--r2);
-    padding:12px;
-    display:flex;
-    gap:12px;
-    align-items:flex-start;
-    background:#fff;
-  }
-  .dot{
-    width:10px;height:10px;border-radius:999px;margin-top:4px;
-    background: var(--canceled);
-    flex:0 0 auto;
-  }
-  .dot.done{background:var(--done)}
-  .dot.progress{background:var(--progress)}
-  .dot.paused{background:var(--paused)}
-  .dot.blocked{background:var(--blocked)}
-  .dot.canceled{background:var(--canceled)}
+    .drawerInfo{
+      display:flex;flex-wrap:wrap;gap:10px;
+      color:var(--muted);font-size:12px;
+    }
+    .drawerInfo b{color:var(--text);font-weight:800}
 
-  .taskMain{flex:1}
-  .taskName{font-weight:900;font-size:13px;margin:0 0 4px}
-  .taskSub{color:var(--muted);font-size:12px;margin:0}
-  .taskRight{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-  .taskPill{
-    font-size:12px;padding:6px 10px;border-radius:999px;
-    border:1px solid var(--line);
-    font-weight:900;
-    background:#f8fafc;
-  }
-  .taskPill.done{background:rgba(22,163,74,.10);border-color:rgba(22,163,74,.18);color:#166534}
-  .taskPill.progress{background:rgba(37,99,235,.10);border-color:rgba(37,99,235,.18);color:#1d4ed8}
-  .taskPill.paused{background:rgba(217,119,6,.10);border-color:rgba(217,119,6,.20);color:#92400e}
-  .taskPill.blocked{background:rgba(220,38,38,.10);border-color:rgba(220,38,38,.18);color:#991b1b}
-  .taskPill.canceled{background:rgba(100,116,139,.10);border-color:rgba(100,116,139,.18);color:#334155}
+    /* Tasks */
+    .tasks{display:flex;flex-direction:column;gap:10px;overflow:auto;padding-right:4px}
+    .task{
+      border:1px solid var(--line);
+      border-radius: var(--r2);
+      padding:12px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      background:#fff;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;margin-top:4px;
+      background: var(--canceled);
+      flex:0 0 auto;
+    }
+    .dot.done{background:var(--done)}
+    .dot.progress{background:var(--progress)}
+    .dot.paused{background:var(--paused)}
+    .dot.blocked{background:var(--blocked)}
+    .dot.canceled{background:var(--canceled)}
 
-  .taskTime{font-size:12px;color:var(--muted);font-weight:900}
+    .taskMain{flex:1}
+    .taskName{font-weight:900;font-size:13px;margin:0 0 4px}
+    .taskSub{color:var(--muted);font-size:12px;margin:0}
+    .taskRight{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+    .taskPill{
+      font-size:12px;padding:6px 10px;border-radius:999px;
+      border:1px solid var(--line);
+      font-weight:900;
+      background:#f8fafc;
+    }
+    .taskPill.done{background:rgba(22,163,74,.10);border-color:rgba(22,163,74,.18);color:#166534}
+    .taskPill.progress{background:rgba(37,99,235,.10);border-color:rgba(37,99,235,.18);color:#1d4ed8}
+    .taskPill.paused{background:rgba(217,119,6,.10);border-color:rgba(217,119,6,.20);color:#92400e}
+    .taskPill.blocked{background:rgba(220,38,38,.10);border-color:rgba(220,38,38,.18);color:#991b1b}
+    .taskPill.canceled{background:rgba(100,116,139,.10);border-color:rgba(100,116,139,.18);color:#334155}
 
-  .empty{
-    padding:18px;
-    color:var(--muted);
-    text-align:center;
-    border:1px dashed var(--line);
-    border-radius: var(--r);
-    background:#fbfbfc;
-  }
-</style>
+    .taskTime{font-size:12px;color:var(--muted);font-weight:900}
+
+    .empty{
+      padding:18px;
+      color:var(--muted);
+      text-align:center;
+      border:1px dashed var(--line);
+      border-radius: var(--r);
+      background:#fbfbfc;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <!-- SEARCH -->
+    <div class="searchRow">
+      <div class="searchBox">
+        <span>🔎</span>
+        <input id="q" placeholder="Напр.: O-AW-3918" autocomplete="off" />
+      </div>
+      <button class="btn" id="btnSearch">Знайти</button>
+      <button class="btn ghost" id="btnDemo" title="Показати демо">Демо</button>
+    </div>
+
+    <!-- ORDER HEADER -->
+    <div class="card" id="orderCard">
+      <div class="cardBd">
+        <div class="orderTitle" id="orderId">—</div>
+        <div class="meta" id="orderMeta"></div>
+
+        <div class="progressRow">
+          <span class="pill ok" id="syncPill">Sync: OK</span>
+          <div class="bar"><div id="orderBar"></div></div>
+          <div class="pct" id="orderPct">—%</div>
+        </div>
+
+        <div class="sectionTitle">
+          <span>Позиції замовлення</span>
+          <small id="itemsSummary">—</small>
+        </div>
+
+        <div class="items" id="items"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAILS DRAWER -->
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="drawer" role="dialog" aria-modal="true" aria-label="Деталі позиції">
+      <div class="drawerTop">
+        <div>
+          <p class="drawerTitle" id="drawerTitle">—</p>
+          <div class="drawerInfo" id="drawerInfo"></div>
+        </div>
+        <button class="close" id="btnClose">✕</button>
+      </div>
+
+      <div class="drawerInfo" id="drawerCurrent"></div>
+
+      <div class="tasks" id="tasks"></div>
+    </div>
+  </div>
+
+  <script>
+    // ===== DEMO (поки без API) =====
+    // Додано: changed_at для задач (час зміни статусу)
+    const DEMO = {
+      order: {
+        external_order_id: "O-AW-3918",
+        created_at: "21.02.2026",
+        deadline: "13.02.2026",
+        customer: "Марина Awarder",
+        sync_status: "OK",
+        progress: 79
+      },
+      line_items: [
+        {
+          id:"LI-1010-GREEN",
+          icon:"📦",
+          title:"Коробочка тактична 1010 — індивідуальний дизайн",
+          sku:"1010 Зелена",
+          qty:1,
+          status:"Done", // Done | InProgress | Paused | Blocked | Canceled
+          percent:100,
+          current:"Відправка товару",
+          next:"—",
+          tasks: [
+            { name:"Створення макету", status:"Done", changed_at:"21.02.2026 10:12" },
+            { name:"Контроль макету", status:"Done", changed_at:"21.02.2026 10:40" },
+            { name:"Друк на плівці", status:"Done", changed_at:"21.02.2026 11:05" },
+            { name:"Вирізання циферблата", status:"Done", changed_at:"21.02.2026 12:20" },
+            { name:"Збірка циферблата", status:"Done", changed_at:"21.02.2026 13:10" },
+            { name:"Контроль якості циферблата", status:"Done", changed_at:"21.02.2026 13:45" },
+            { name:"Збірка годинника", status:"Done", changed_at:"21.02.2026 16:05" },
+            { name:"Нанесення гравіювання", status:"Done", changed_at:"21.02.2026 18:10" },
+            { name:"Контроль якості годинника", status:"Done", changed_at:"21.02.2026 19:00" },
+            { name:"Відправка товару", status:"Done", changed_at:"21.02.2026 22:00" }
+          ]
+        },
+        {
+          id:"LI-AW055",
+          icon:"⌚",
+          title:"Awarder 055 — індивідуальний дизайн",
+          sku:"Silver-Black",
+          qty:1,
+          status:"InProgress",
+          percent:58,
+          current:"Збірка циферблата",
+          next:"Контроль якості циферблата",
+          tasks: [
+            { name:"Створення макету", status:"Done", changed_at:"21.02.2026 09:30" },
+            { name:"Контроль макету", status:"Done", changed_at:"21.02.2026 10:05" },
+            { name:"Друк на плівці", status:"Done", changed_at:"21.02.2026 10:40" },
+            { name:"Вирізання циферблата", status:"Done", changed_at:"21.02.2026 11:50" },
+            { name:"Збірка циферблата", status:"InProgress", changed_at:"21.02.2026 12:15" },
+            { name:"Контроль якості циферблата", status:"Canceled", changed_at:"—", note:"Ще не запускали" },
+            { name:"Збірка годинника", status:"Canceled", changed_at:"—", note:"Ще не запускали" },
+            { name:"Нанесення гравіювання", status:"Canceled", changed_at:"—", note:"Ще не запускали" },
+            { name:"Контроль якості годинника", status:"Canceled", changed_at:"—", note:"Ще не запускали" },
+            { name:"Відправка товару", status:"Canceled", changed_at:"—", note:"Ще не запускали" }
+          ]
+        }
+      ]
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function statusLabel(s){
+      return ({
+        Done:"Виконано",
+        InProgress:"У роботі",
+        Paused:"На паузі",
+        Blocked:"Заблоковано",
+        Canceled:"Скасовано"
+      }[s] || "—");
+    }
+    function statusClass(s){
+      return ({
+        Done:"done",
+        InProgress:"progress",
+        Paused:"paused",
+        Blocked:"blocked",
+        Canceled:"canceled"
+      }[s] || "canceled");
+    }
+    function esc(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function latestChangedAt(tasks){
+      const valid = (tasks||[]).map(t=>t.changed_at).filter(x=>x && x!=="—");
+      return valid.length ? valid[valid.length-1] : "—";
+    }
+
+    function render(data){
+      $("orderId").textContent = data.order.external_order_id;
+
+      $("orderMeta").innerHTML = `
+        <span>📅 Створено: <b>${esc(data.order.created_at)}</b></span>
+        <span>⏳ Дедлайн: <b>${esc(data.order.deadline)}</b></span>
+        <span>👤 Клієнт: <b>${esc(data.order.customer)}</b></span>
+      `;
+
+      $("syncPill").textContent = `Sync: ${esc(data.order.sync_status)}`;
+      $("orderBar").style.width = `${Number(data.order.progress||0)}%`;
+      $("orderPct").textContent = `${Number(data.order.progress||0)}%`;
+
+      const total = data.line_items.length;
+      const inWork = data.line_items.filter(x=>x.status==="InProgress").length;
+      const risks = data.line_items.filter(x=>x.status==="Blocked").length;
+
+      // ✅ Явно показуємо кількість позицій
+      $("itemsSummary").textContent = `Позицій: ${total} • У роботі: ${inWork} • Ризики: ${risks}`;
+
+      const wrap = $("items");
+      wrap.innerHTML = "";
+
+      if(!total){
+        wrap.innerHTML = `<div class="empty">Немає позицій у замовленні</div>`;
+        return;
+      }
+
+      data.line_items.forEach(li=>{
+        const stCls = statusClass(li.status);
+        const updated = latestChangedAt(li.tasks);
+
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <div class="ico">${esc(li.icon || "🧩")}</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <p class="itTitle">${esc(li.title)}</p>
+              <span class="pill statusPill ${stCls}">${statusLabel(li.status)}</span>
+            </div>
+            <div class="itMeta">
+              <span>SKU: <b>${esc(li.sku)}</b></span>
+              <span>К-сть: <b>${Number(li.qty||0)}</b></span>
+              <span>Current: <b>${esc(li.current || "—")}</b></span>
+              <span>Next: <b>${esc(li.next || "—")}</b></span>
+              <span>Оновлено: <b>${esc(updated)}</b></span>
+            </div>
+          </div>
+          <div class="right">
+            <div class="miniBar"><div style="width:${Number(li.percent||0)}%"></div></div>
+            <div class="miniPct">${Number(li.percent||0)}%</div>
+          </div>
+        `;
+        div.addEventListener("click", ()=> openDetails(li));
+        wrap.appendChild(div);
+      });
+    }
+
+    function openDetails(li){
+      $("overlay").classList.add("show");
+      $("overlay").setAttribute("aria-hidden","false");
+
+      $("drawerTitle").textContent = li.title;
+
+      const updated = latestChangedAt(li.tasks);
+
+      $("drawerInfo").innerHTML = `
+        <span>ID: <b>${esc(li.id)}</b></span>
+        <span>SKU: <b>${esc(li.sku)}</b></span>
+        <span>К-сть: <b>${Number(li.qty||0)}</b></span>
+        <span>Оновлено: <b>${esc(updated)}</b></span>
+        <span class="pill ${statusClass(li.status)}">${statusLabel(li.status)}</span>
+      `;
+
+      $("drawerCurrent").innerHTML = `
+        <span>Current: <b>${esc(li.current || "—")}</b></span>
+        <span>Next: <b>${esc(li.next || "—")}</b></span>
+      `;
+
+      const tasks = $("tasks");
+      tasks.innerHTML = "";
+
+      (li.tasks || []).forEach(t=>{
+        const cls = statusClass(t.status);
+        const row = document.createElement("div");
+        row.className = "task";
+        row.innerHTML = `
+          <div class="dot ${cls}"></div>
+          <div class="taskMain">
+            <p class="taskName">${esc(t.name)}</p>
+            <p class="taskSub">${t.note ? esc(t.note) : "—"}</p>
+          </div>
+          <div class="taskRight">
+            <span class="taskPill ${cls}">${statusLabel(t.status)}</span>
+            <span class="taskTime">Оновлено: ${esc(t.changed_at || "—")}</span>
+          </div>
+        `;
+        tasks.appendChild(row);
+      });
+
+      if(!(li.tasks||[]).length){
+        tasks.innerHTML = `<div class="empty">Немає задач по цій позиції</div>`;
+      }
+    }
+
+    function closeDetails(){
+      $("overlay").classList.remove("show");
+      $("overlay").setAttribute("aria-hidden","true");
+    }
+
+    function searchByExternalId(externalId){
+      const clone = JSON.parse(JSON.stringify(DEMO));
+      clone.order.external_order_id = externalId || DEMO.order.external_order_id;
+      return clone;
+    }
+
+    $("btnSearch").addEventListener("click", ()=>{
+      const id = $("q").value.trim();
+      if(!id){ alert("Введіть номер замовлення (external_order_id)."); return; }
+      render(searchByExternalId(id));
+    });
+
+    $("btnDemo").addEventListener("click", ()=>{
+      $("q").value = DEMO.order.external_order_id;
+      render(DEMO);
+    });
+
+    $("q").addEventListener("keydown",(e)=>{ if(e.key==="Enter") $("btnSearch").click(); });
+
+    $("btnClose").addEventListener("click", closeDetails);
+    $("overlay").addEventListener("click",(e)=>{ if(e.target === $("overlay")) closeDetails(); });
+    window.addEventListener("keydown",(e)=>{ if(e.key==="Escape") closeDetails(); });
+
+    // старт демо
+    render(DEMO);
+  </script>
+</body>
+</html>
