@@ -3,202 +3,175 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Hesh Workflow</title>
+  <title>Workflow — Hesh-like</title>
 
-  <!-- Clean UI font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --bg:#ffffff;
-      --panel:#ffffff;
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#e5e7ef;
+      --line2:#eef1f7;
 
-      --text:#121826;
-      --muted:#6b7280;
+      --blue:#3b82f6;
+      --green:#22c55e;
+      --orange:#f59e0b;
+      --red:#ef4444;
+      --gray:#94a3b8;
 
-      --line:#e8eaef;
-      --line2:#eef0f5;
-
-      --accent:#3b5bdc;         /* blue like sample */
-      --accent2:#2f4fd6;
-
-      --success:#1f9d55;
-      --warn:#c77800;
-      --danger:#c03a3a;
-      --neutral:#6b7280;
-
-      --r:16px;
-      --shadow: 0 14px 40px rgba(18,24,38,.08);
-      --shadow2: 0 10px 22px rgba(18,24,38,.06);
+      --radius:16px;
+      --shadow: 0 10px 30px rgba(15,23,42,.08);
+      --shadow2: 0 6px 18px rgba(15,23,42,.06);
     }
 
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     body{
       margin:0;
-      background:var(--bg);
-      color:var(--text);
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      letter-spacing: .1px;
+      background: var(--bg);
+      color: var(--text);
     }
 
-    /* ===== Layout ===== */
     .wrap{
-      max-width: 1120px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 26px 18px 90px;
+      padding: 18px 16px 70px;
     }
 
-    .topLine{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:18px;
+    /* ===== Top Search ===== */
+    .top{
+      position: sticky;
+      top:0;
+      z-index:10;
+      background: linear-gradient(to bottom, rgba(246,247,251,.98), rgba(246,247,251,.92));
+      backdrop-filter: blur(10px);
+      padding: 10px 0 14px;
+      margin-bottom: 10px;
     }
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width: 220px;
-    }
-    .mark{
-      width: 14px; height: 14px;
-      border:2px solid var(--accent);
-      border-radius: 4px;
-    }
-    .brand b{
-      font-weight:800;
-      letter-spacing:.2px;
-    }
-
-    /* ===== Search ===== */
     .searchRow{
       display:flex;
-      gap:12px;
+      gap: 12px;
       align-items:center;
-      margin: 14px 0 18px;
     }
+
     .search{
       flex:1;
       display:flex;
       align-items:center;
       gap:10px;
-      border:1px solid var(--line);
-      border-radius: 999px;
-      padding: 14px 16px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
       background: #fff;
+      border-radius: 999px;
       box-shadow: var(--shadow2);
     }
-    .search .icon{ color:var(--accent); font-weight:900; }
+    .search .icon{ color: var(--muted); }
     .search input{
       width:100%;
       border:0;
       outline:0;
-      background:transparent;
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 15px;
+      font-weight: 650;
       color: var(--text);
+      background: transparent;
     }
-    .search input::placeholder{ color:#9aa3b2; font-weight:600; }
+    .search input::placeholder{ color:#94a3b8; font-weight:600; }
 
     .btn{
-      border:1px solid var(--accent);
-      background: transparent;
-      color: var(--accent);
-      padding: 14px 18px;
+      border: 1px solid transparent;
+      background: var(--blue);
+      color:#fff;
+      padding: 12px 16px;
       border-radius: 999px;
-      font-weight: 800;
       cursor:pointer;
+      font-weight: 800;
       letter-spacing:.2px;
-      text-transform: uppercase;
-      font-size: 12px;
+      box-shadow: var(--shadow2);
     }
-    .btn:hover{
-      background: rgba(59,91,220,.06);
-      border-color: var(--accent2);
-      color: var(--accent2);
-    }
-    .btnSolid{
-      border:1px solid var(--accent);
-      background: var(--accent);
-      color:#fff;
-    }
-    .btnSolid:hover{
-      background: var(--accent2);
-      border-color: var(--accent2);
-      color:#fff;
-    }
-
-    /* ===== Order header ===== */
-    .orderBox{
+    .btn:hover{ filter: brightness(.98); }
+    .btnGhost{
+      background:#fff;
       border:1px solid var(--line);
-      border-radius: var(--r);
-      background: var(--panel);
+      color: var(--text);
+    }
+    .btnGhost:hover{ background:#fbfcff; }
+
+    /* ===== Cards ===== */
+    .card{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 18px;
     }
 
-    .orderTitle{
+    .orderHeader{
+      padding: 16px 16px 14px;
+      margin-top: 10px;
+    }
+
+    .orderTopLine{
       display:flex;
-      justify-content:space-between;
-      gap:12px;
       align-items:flex-start;
-      flex-wrap:wrap;
-      margin-bottom: 8px;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     .orderId{
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing:.3px;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing:.2px;
     }
+
     .meta{
       display:flex;
       flex-wrap:wrap;
-      gap: 10px 18px;
+      gap: 10px 16px;
+      margin-top: 8px;
       color: var(--muted);
       font-size: 13px;
-      font-weight: 600;
-      margin-top: 8px;
+      font-weight: 650;
     }
-    .meta b{ color: var(--text); font-weight: 800; }
+    .meta b{ color: var(--text); font-weight: 850; }
 
-    .sync{
+    .pill{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding: 10px 12px;
+      padding: 9px 12px;
       border-radius: 999px;
-      border:1px solid var(--line);
+      border: 1px solid var(--line);
       background:#fff;
-      font-weight: 800;
-      color: var(--text);
+      font-weight: 850;
       font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing:.3px;
+      color: var(--text);
       white-space:nowrap;
     }
-    .syncDot{
-      width: 10px; height: 10px;
-      border-radius: 999px;
-      background: var(--success);
-      box-shadow: 0 0 0 6px rgba(31,157,85,.10);
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: var(--gray);
+      box-shadow: 0 0 0 5px rgba(148,163,184,.16);
     }
+    .pill.ok{ border-color: rgba(34,197,94,.25); color: #15803d; }
+    .pill.ok .dot{ background: var(--green); box-shadow: 0 0 0 5px rgba(34,197,94,.16); }
 
     .progressRow{
-      margin-top: 14px;
       display:flex;
       align-items:center;
-      gap:12px;
+      gap: 12px;
+      margin-top: 14px;
     }
     .bar{
       flex:1;
-      height: 8px;
-      background: #f0f2f7;
+      height: 10px;
+      background: #eef2ff;
       border: 1px solid var(--line2);
       border-radius: 999px;
       overflow:hidden;
@@ -206,199 +179,204 @@
     .bar > div{
       height:100%;
       width:0%;
-      background: var(--accent);
+      background: linear-gradient(90deg, #60a5fa, #3b82f6);
       transition: width .35s ease;
     }
     .pct{
-      min-width:56px;
+      min-width: 56px;
       text-align:right;
-      font-weight: 800;
       color: var(--muted);
+      font-weight: 900;
       font-size: 12px;
-      letter-spacing:.2px;
-      text-transform: uppercase;
     }
 
-    /* ===== Section ===== */
     .sectionHead{
-      margin-top: 18px;
-      padding-top: 16px;
-      border-top: 1px solid var(--line2);
       display:flex;
-      justify-content:space-between;
-      gap:12px;
       align-items:flex-end;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 14px 16px 0;
+      margin-top: 8px;
     }
     .sectionHead h3{
       margin:0;
       font-size: 14px;
-      font-weight: 900;
-      letter-spacing: .7px;
-      text-transform: uppercase;
-      color: var(--text);
-    }
-    .summary{
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 700;
-      text-transform: uppercase;
+      font-weight: 950;
       letter-spacing:.4px;
     }
-
-    /* ===== Cards grid like your sample ===== */
-    .grid{
-      margin-top: 16px;
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 22px;
-    }
-    @media (max-width: 980px){
-      .grid{ grid-template-columns: repeat(2,1fr); }
-    }
-    @media (max-width: 640px){
-      .grid{ grid-template-columns: 1fr; }
-    }
-
-    .card{
-      border: 1px solid var(--line);
-      border-radius: var(--r);
-      background:#fff;
-      padding: 18px 18px 16px;
-      box-shadow: var(--shadow2);
-      cursor:pointer;
-      transition: transform .08s ease, border-color .12s ease;
-      min-height: 240px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-    }
-    .card:hover{
-      transform: translateY(-1px);
-      border-color: rgba(59,91,220,.25);
-    }
-
-    .kicker{
-      font-size: 13px;
-      font-weight: 900;
-      letter-spacing: .8px;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin:0 0 10px;
-      line-height: 1.15;
-    }
-
-    .bigLine{
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom: 10px;
-    }
-    .percentBig{
-      font-size: 13px;
-      font-weight: 900;
-      letter-spacing:.6px;
-      text-transform: uppercase;
-      color: var(--muted);
-      white-space:nowrap;
-    }
-
-    .subLine{
+    .summary{
       color: var(--muted);
       font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing:.35px;
-      margin: 0 0 12px;
-    }
-    .subLine b{
-      color: var(--text);
-      font-weight: 900;
+      font-weight: 850;
     }
 
-    .desc{
-      color: #7a8396;
-      font-size: 13px;
-      line-height: 1.55;
-      margin: 0 0 16px;
-      font-weight: 500;
+    /* ===== Items list (Hesh-like rows) ===== */
+    .items{
+      padding: 12px 12px 14px;
     }
 
-    .tagRow{
+    .item{
       display:flex;
-      flex-wrap:wrap;
-      gap:8px;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line2);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 4px 14px rgba(15,23,42,.05);
       margin-bottom: 12px;
+      cursor:pointer;
+      transition: transform .08s ease, border-color .12s ease;
+      align-items: stretch;
     }
-    .tag{
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 7px 10px;
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing:.35px;
-      color: var(--muted);
-      background:#fff;
+    .item:hover{
+      transform: translateY(-1px);
+      border-color: rgba(59,130,246,.22);
+    }
+
+    .thumb{
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      border: 1px solid var(--line2);
+      background: linear-gradient(180deg,#fbfcff,#f1f5ff);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex: 0 0 auto;
+      overflow:hidden;
+    }
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+    }
+    .thumb .emoji{ font-size: 22px; color:#475569; }
+
+    .itemMain{
+      flex:1;
+      min-width:0;
+    }
+    .titleRow{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .itemTitle{
+      margin:0;
+      font-size: 15px;
+      font-weight: 900;
+      line-height:1.25;
     }
 
     .statusPill{
       display:inline-flex;
       align-items:center;
       gap:8px;
+      padding: 8px 10px;
       border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 12px;
       font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing:.35px;
+      font-size: 12px;
       border: 1px solid var(--line);
       background:#fff;
-      color: var(--text);
-      width: fit-content;
+      white-space: nowrap;
     }
-    .stDot{
-      width:9px;height:9px;border-radius:999px;background: var(--neutral);
+    .statusPill .sDot{ width:9px;height:9px;border-radius:999px;background: var(--gray); }
+
+    .st-done{ color:#15803d; border-color: rgba(34,197,94,.25); }
+    .st-done .sDot{ background: var(--green); }
+
+    .st-progress{ color:#1d4ed8; border-color: rgba(59,130,246,.25); }
+    .st-progress .sDot{ background: var(--blue); }
+
+    .st-paused{ color:#b45309; border-color: rgba(245,158,11,.25); }
+    .st-paused .sDot{ background: var(--orange); }
+
+    .st-blocked{ color:#b91c1c; border-color: rgba(239,68,68,.25); }
+    .st-blocked .sDot{ background: var(--red); }
+
+    .st-canceled{ color:#475569; border-color: rgba(148,163,184,.35); }
+    .st-canceled .sDot{ background: var(--gray); }
+
+    .sub{
+      margin-top: 8px;
+      display:flex;
+      flex-wrap:wrap;
+      gap: 8px 14px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      min-width:0;
     }
-    .statusPill.done{ border-color: rgba(31,157,85,.25); color: var(--success); }
-    .statusPill.done .stDot{ background: var(--success); }
+    .sub b{ color: var(--text); font-weight: 850; }
 
-    .statusPill.progress{ border-color: rgba(59,91,220,.25); color: var(--accent); }
-    .statusPill.progress .stDot{ background: var(--accent); }
-
-    .statusPill.paused{ border-color: rgba(199,120,0,.25); color: var(--warn); }
-    .statusPill.paused .stDot{ background: var(--warn); }
-
-    .statusPill.blocked{ border-color: rgba(192,58,58,.25); color: var(--danger); }
-    .statusPill.blocked .stDot{ background: var(--danger); }
-
-    .statusPill.canceled{ border-color: rgba(107,114,128,.25); color: var(--neutral); }
-    .statusPill.canceled .stDot{ background: var(--neutral); }
-
-    .readMore{
-      margin-top: 10px;
+    .sub .chip{
       display:inline-flex;
+      gap:6px;
       align-items:center;
-      justify-content:center;
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      text-decoration:none;
-      border-radius: 0;              /* like sample square-ish */
-      padding: 12px 14px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line2);
+      background:#fff;
+      font-weight: 750;
+      color:#475569;
+      max-width: 100%;
+    }
+    .sub .chip strong{ color:var(--text); font-weight: 900; }
+
+    .itemRight{
+      width: 220px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:10px;
+      flex: 0 0 auto;
+      padding-left: 4px;
+    }
+
+    .smallLabel{
+      color: var(--muted);
       font-size: 11px;
       font-weight: 900;
-      letter-spacing: .9px;
+      letter-spacing:.2px;
       text-transform: uppercase;
-      width: 170px;
-      background:#fff;
+      text-align:right;
     }
-    .readMore:hover{ background: rgba(59,91,220,.06); }
+    .miniBar{
+      height: 8px;
+      border-radius: 999px;
+      background:#f1f5f9;
+      border: 1px solid var(--line2);
+      overflow:hidden;
+    }
+    .miniBar > div{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(34,197,94,.9), rgba(34,197,94,.55));
+      transition: width .35s ease;
+    }
+    .miniBar.blue > div{
+      background: linear-gradient(90deg, rgba(59,130,246,.9), rgba(59,130,246,.55));
+    }
+    .miniBar.orange > div{
+      background: linear-gradient(90deg, rgba(245,158,11,.95), rgba(245,158,11,.55));
+    }
+    .miniBar.red > div{
+      background: linear-gradient(90deg, rgba(239,68,68,.9), rgba(239,68,68,.55));
+    }
 
-    /* ===== Drawer ===== */
+    @media (max-width: 860px){
+      .item{ flex-direction:column; }
+      .itemRight{ width:100%; }
+      .smallLabel{ text-align:left; }
+    }
+
+    /* ===== Drawer (details) ===== */
     .overlay{
       position: fixed;
       inset: 0;
-      background: rgba(18,24,38,.28);
+      background: rgba(15,23,42,.35);
       display:none;
       justify-content:flex-end;
       z-index: 60;
@@ -406,123 +384,117 @@
     .overlay.show{ display:flex; }
 
     .drawer{
-      width: min(560px, 100%);
-      height:100%;
-      background:#fff;
+      width: min(520px, 100%);
+      height: 100%;
+      background: #fff;
       border-left: 1px solid var(--line);
-      box-shadow: -16px 0 50px rgba(18,24,38,.20);
+      box-shadow: -16px 0 50px rgba(15,23,42,.25);
       display:flex;
       flex-direction:column;
     }
 
     .drawerHd{
-      padding: 18px;
+      padding: 16px 16px 12px;
       border-bottom: 1px solid var(--line2);
       display:flex;
       justify-content:space-between;
       gap:12px;
       align-items:flex-start;
     }
-
     .drawerTitle{
       margin:0;
-      font-size: 18px;
-      font-weight: 900;
-      letter-spacing:.2px;
+      font-size: 16px;
+      font-weight: 950;
+      line-height:1.2;
     }
-
     .drawerMeta{
       margin-top: 10px;
       display:flex;
       flex-wrap:wrap;
-      gap: 8px 14px;
+      gap: 8px 12px;
       color: var(--muted);
       font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing:.35px;
+      font-weight: 650;
     }
     .drawerMeta b{ color:var(--text); font-weight: 900; }
 
-    .xBtn{
-      border:1px solid var(--line);
+    .close{
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid var(--line2);
       background:#fff;
-      width: 44px;
-      height: 44px;
-      border-radius: 999px;
       cursor:pointer;
       font-size: 18px;
       font-weight: 900;
       color: var(--text);
     }
-    .xBtn:hover{ background:#fafafa; }
+    .close:hover{ background:#fbfcff; }
 
     .drawerSub{
-      padding: 14px 18px;
+      padding: 12px 16px;
       border-bottom: 1px solid var(--line2);
       display:flex;
       flex-wrap:wrap;
-      gap: 10px 16px;
-      font-size: 12px;
+      gap: 10px 14px;
       color: var(--muted);
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing:.35px;
+      font-size: 12px;
+      font-weight: 700;
     }
-    .drawerSub b{ color:var(--text); font-weight: 900; }
+    .drawerSub b{ color: var(--text); font-weight: 900; }
+
+    .legend{
+      padding: 10px 16px 0;
+      display:flex;
+      flex-wrap:wrap;
+      gap: 8px;
+    }
+    .legend .pill{ padding: 7px 10px; font-size: 11px; border-color: var(--line2); }
 
     .tasks{
-      padding: 16px 18px 26px;
+      padding: 12px 16px 20px;
       overflow:auto;
     }
 
     .task{
-      border: 1px solid var(--line);
-      border-radius: var(--r);
-      padding: 14px 14px;
+      border: 1px solid var(--line2);
+      border-radius: 14px;
+      padding: 12px;
       background:#fff;
-      margin-bottom: 12px;
       display:flex;
-      align-items:flex-start;
       justify-content:space-between;
       gap: 12px;
+      align-items:flex-start;
+      margin-bottom: 10px;
     }
     .taskLeft{
       display:flex;
       gap: 10px;
-      align-items:flex-start;
-      min-width: 0;
+      min-width:0;
     }
-    .taskDot{
-      width: 10px; height: 10px;
+    .tDot{
+      width: 10px;
+      height: 10px;
       border-radius: 999px;
       margin-top: 5px;
-      background: var(--neutral);
+      background: var(--gray);
       flex: 0 0 auto;
     }
-    .taskDot.done{ background: var(--success); }
-    .taskDot.progress{ background: var(--accent); }
-    .taskDot.paused{ background: var(--warn); }
-    .taskDot.blocked{ background: var(--danger); }
-    .taskDot.canceled{ background: var(--neutral); }
-
-    .taskName{
+    .tName{
       margin:0;
       font-size: 13px;
       font-weight: 900;
-      letter-spacing:.35px;
-      text-transform: uppercase;
-      line-height: 1.25;
-      white-space: normal;
+      line-height:1.25;
       word-break: break-word;
     }
-    .taskNote{
+    .tNote{
       margin: 6px 0 0;
-      color:#7a8396;
-      font-size: 13px;
-      line-height: 1.5;
-      font-weight: 500;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 550;
+      line-height:1.45;
     }
+
     .taskRight{
       display:flex;
       flex-direction:column;
@@ -530,55 +502,65 @@
       gap: 8px;
       flex: 0 0 auto;
     }
-    .time{
+    .tTime{
       color: var(--muted);
       font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing:.35px;
+      font-weight: 850;
       white-space:nowrap;
     }
 
     .empty{
-      border: 1px dashed rgba(59,91,220,.35);
-      padding: 16px;
-      border-radius: var(--r);
+      border: 1px dashed rgba(59,130,246,.35);
+      border-radius: 14px;
+      padding: 14px;
       color: var(--muted);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing:.35px;
-      font-size: 12px;
+      font-weight: 750;
       background:#fff;
+    }
+
+    /* Prevent white screen from silent errors */
+    .errorBox{
+      margin-top: 10px;
+      padding: 12px 14px;
+      border: 1px solid rgba(239,68,68,.25);
+      background: #fff;
+      border-radius: 14px;
+      color:#b91c1c;
+      font-weight: 750;
+      display:none;
+    }
+    .errorBox.show{ display:block; }
+    .mutedNote{
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      margin-top: 8px;
     }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-
-    <div class="topLine">
-      <div class="brand">
-        <span class="mark"></span>
-        <b>Workflow</b>
+    <div class="top">
+      <div class="searchRow">
+        <div class="search">
+          <div class="icon">🔎</div>
+          <input id="q" placeholder="Напр.: O-AW-3918" autocomplete="off" />
+        </div>
+        <button class="btn" id="btnSearch">Знайти</button>
+        <button class="btn btnGhost" id="btnDemo">Демо</button>
       </div>
-      <button class="btn btnSolid" id="btnDemo">Демо-дані</button>
+      <div class="errorBox" id="err"></div>
     </div>
 
-    <div class="searchRow">
-      <div class="search">
-        <div class="icon">🔎</div>
-        <input id="q" placeholder="Напр.: O-AW-3918" autocomplete="off" />
-      </div>
-      <button class="btn btnSolid" id="btnSearch">Знайти</button>
-    </div>
-
-    <div class="orderBox" id="orderBox">
-      <div class="orderTitle">
+    <!-- Order -->
+    <div class="card orderHeader" id="orderBox" style="display:none;">
+      <div class="orderTopLine">
         <div>
           <div class="orderId" id="orderId">—</div>
           <div class="meta" id="orderMeta"></div>
         </div>
-        <div class="sync" id="syncPill"><span class="syncDot"></span> Sync: OK</div>
+        <div class="pill ok" id="syncPill"><span class="dot"></span> Sync: OK</div>
       </div>
 
       <div class="progressRow">
@@ -591,9 +573,12 @@
         <div class="summary" id="itemsSummary">—</div>
       </div>
 
-      <div class="grid" id="grid"></div>
+      <div class="items" id="items"></div>
     </div>
 
+    <div class="mutedNote">
+      Натисни на позицію — справа відкриється детальний Workflow з усіма задачами, їх статусом і часом зміни.
+    </div>
   </div>
 
   <!-- Drawer -->
@@ -604,16 +589,31 @@
           <p class="drawerTitle" id="drawerTitle">—</p>
           <div class="drawerMeta" id="drawerMeta"></div>
         </div>
-        <button class="xBtn" id="btnClose" aria-label="Close">×</button>
+        <button class="close" id="btnClose" aria-label="Close">×</button>
       </div>
 
       <div class="drawerSub" id="drawerSub"></div>
+
+      <div class="legend">
+        <span class="statusPill st-done"><span class="sDot"></span> Виконано</span>
+        <span class="statusPill st-progress"><span class="sDot"></span> У роботі</span>
+        <span class="statusPill st-paused"><span class="sDot"></span> На паузі</span>
+        <span class="statusPill st-blocked"><span class="sDot"></span> Заблоковано</span>
+        <span class="statusPill st-canceled"><span class="sDot"></span> Скасовано</span>
+      </div>
+
       <div class="tasks" id="tasks"></div>
     </div>
   </div>
 
   <script>
-    // ===== DEMO DATA (поки без API) =====
+    /*********************************************************
+     * IMPORTANT (for your IT)
+     * Hesh API tokens SHOULD NOT be used directly in browser.
+     * Make a backend/proxy endpoint like /api/order?externalId=...
+     * and return a normalized JSON in the same structure as DEMO.
+     *********************************************************/
+
     const DEMO = {
       order: {
         external_order_id: "O-AW-3918",
@@ -634,6 +634,7 @@
           current:"Відправка товару",
           next:"—",
           changed_last:"21.02.2026 22:00",
+          thumb_emoji:"📦",
           tasks: [
             { name:"Створення макету", status:"Done", changed_at:"21.02.2026 10:12", note:"—" },
             { name:"Контроль макету", status:"Done", changed_at:"21.02.2026 10:40", note:"—" },
@@ -657,6 +658,7 @@
           current:"Збірка циферблата",
           next:"Контроль якості циферблата",
           changed_last:"21.02.2026 14:02",
+          thumb_emoji:"⌚",
           tasks: [
             { name:"Створення макету", status:"Done", changed_at:"21.02.2026 09:30", note:"—" },
             { name:"Контроль макету", status:"Done", changed_at:"21.02.2026 10:05", note:"—" },
@@ -665,31 +667,14 @@
             { name:"Збірка циферблата", status:"InProgress", changed_at:"21.02.2026 12:15", note:"Активна задача" },
             { name:"Контроль якості циферблата", status:"Paused", changed_at:"21.02.2026 14:02", note:"Очікує деталі" },
             { name:"Збірка годинника", status:"Canceled", changed_at:"—", note:"Ще не запускали" },
-            { name:"Нанесення гравіювання", status:"Canceled", changed_at:"—", note:"Ще не запускали" },
-            { name:"Контроль якості годинника", status:"Canceled", changed_at:"—", note:"Ще не запускали" },
-            { name:"Відправка товару", status:"Canceled", changed_at:"—", note:"Ще не запускали" }
-          ]
-        },
-        {
-          id:"LI-AW022",
-          title:"Awarder 022 — індивідуальний дизайн",
-          sku:"Black",
-          qty:2,
-          status:"Blocked",
-          percent:22,
-          current:"Контроль макету",
-          next:"Друк на плівці",
-          changed_last:"21.02.2026 11:12",
-          tasks: [
-            { name:"Створення макету", status:"Done", changed_at:"21.02.2026 10:10", note:"—" },
-            { name:"Контроль макету", status:"Blocked", changed_at:"21.02.2026 11:12", note:"Потрібне узгодження" },
-            { name:"Друк на плівці", status:"Canceled", changed_at:"—", note:"Очікує" }
+            { name:"Нанесення гравіювання", status:"Canceled", changed_at:"—", note:"—" },
+            { name:"Контроль якості годинника", status:"Canceled", changed_at:"—", note:"—" },
+            { name:"Відправка товару", status:"Canceled", changed_at:"—", note:"—" }
           ]
         }
       ]
     };
 
-    // ===== Helpers =====
     const $ = (id) => document.getElementById(id);
 
     function esc(s){
@@ -701,6 +686,17 @@
         .replaceAll("'","&#039;");
     }
 
+    function showError(msg){
+      const el = $("err");
+      el.textContent = msg;
+      el.classList.add("show");
+    }
+    function clearError(){
+      const el = $("err");
+      el.textContent = "";
+      el.classList.remove("show");
+    }
+
     function statusLabel(s){
       return ({
         Done:"Виконано",
@@ -710,150 +706,184 @@
         Canceled:"Скасовано"
       }[s] || "—");
     }
-
     function statusClass(s){
       return ({
-        Done:"done",
-        InProgress:"progress",
-        Paused:"paused",
-        Blocked:"blocked",
-        Canceled:"canceled"
-      }[s] || "canceled");
+        Done:"st-done",
+        InProgress:"st-progress",
+        Paused:"st-paused",
+        Blocked:"st-blocked",
+        Canceled:"st-canceled"
+      }[s] || "st-canceled");
+    }
+    function statusBarClass(s){
+      if(s==="Done") return "";            // green default
+      if(s==="InProgress") return "blue";
+      if(s==="Paused") return "orange";
+      if(s==="Blocked") return "red";
+      return "";
+    }
+    function dotClass(s){
+      if(s==="Done") return "background: var(--green)";
+      if(s==="InProgress") return "background: var(--blue)";
+      if(s==="Paused") return "background: var(--orange)";
+      if(s==="Blocked") return "background: var(--red)";
+      return "background: var(--gray)";
+    }
+    function safeNum(n, def=0){
+      const x = Number(n);
+      return Number.isFinite(x) ? x : def;
     }
 
-    function latestChangedAt(tasks){
-      const valid = (tasks||[])
-        .map(t=>t.changed_at)
-        .filter(x=>x && x!=="—");
-      return valid.length ? valid[valid.length-1] : "—";
+    // ===== This is what IT will replace (real fetch) =====
+    async function fetchOrder(externalId){
+      // DEMO behavior:
+      const data = JSON.parse(JSON.stringify(DEMO));
+      data.order.external_order_id = externalId;
+
+      // You can simulate "not found"
+      if(!externalId || externalId.length < 3) {
+        throw new Error("Введи коректний номер замовлення.");
+      }
+      return data;
+
+      // REAL (example, should be backend proxy):
+      // const r = await fetch(`/api/order?externalId=${encodeURIComponent(externalId)}`);
+      // if(!r.ok) throw new Error("Замовлення не знайдено або помилка API.");
+      // return await r.json();
     }
 
-    // ===== Render =====
     function render(data){
+      $("orderBox").style.display = "block";
+
       $("orderId").textContent = data.order.external_order_id;
 
       $("orderMeta").innerHTML = `
-        <span>Створено: <b>${esc(data.order.created_at)}</b></span>
-        <span>Дедлайн: <b>${esc(data.order.deadline)}</b></span>
-        <span>Клієнт: <b>${esc(data.order.customer)}</b></span>
+        <span>📅 Створено: <b>${esc(data.order.created_at)}</b></span>
+        <span>⏳ Дедлайн: <b>${esc(data.order.deadline)}</b></span>
+        <span>👤 Клієнт: <b>${esc(data.order.customer)}</b></span>
       `;
 
-      $("syncPill").innerHTML = `<span class="syncDot"></span> Sync: ${esc(data.order.sync_status)}`;
+      const syncOk = String(data.order.sync_status || "OK").toUpperCase() === "OK";
+      $("syncPill").className = "pill " + (syncOk ? "ok" : "");
+      $("syncPill").innerHTML = `<span class="dot"></span> Sync: ${esc(data.order.sync_status || "—")}`;
 
-      const op = Number(data.order.progress||0);
+      const op = safeNum(data.order.progress, 0);
       $("orderBar").style.width = `${op}%`;
       $("orderPct").textContent = `${op}%`;
 
-      const total = data.line_items.length;
-      const inWork = data.line_items.filter(x=>x.status==="InProgress").length;
-      const risks = data.line_items.filter(x=>x.status==="Blocked").length;
+      const items = data.line_items || [];
+      const total = items.length;
+      const inWork = items.filter(x=>x.status==="InProgress").length;
+      const risks = items.filter(x=>x.status==="Blocked").length;
       $("itemsSummary").textContent = `К-сть позицій: ${total} · У роботі: ${inWork} · Ризики: ${risks}`;
 
-      const grid = $("grid");
-      grid.innerHTML = "";
+      const root = $("items");
+      root.innerHTML = "";
 
       if(!total){
-        grid.innerHTML = `<div class="empty">Немає позицій у замовленні</div>`;
+        root.innerHTML = `<div class="empty">Немає позицій у замовленні</div>`;
         return;
       }
 
-      data.line_items.forEach(li=>{
-        const cls = statusClass(li.status);
-        const upd = li.changed_last || latestChangedAt(li.tasks);
+      items.forEach(li=>{
+        const stCls = statusClass(li.status);
+        const pct = safeNum(li.percent, 0);
+        const barCls = statusBarClass(li.status);
+        const changed = li.changed_last || "—";
 
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <div>
-            <div class="bigLine">
-              <p class="kicker">${esc(li.title)}</p>
-              <div class="percentBig">${Number(li.percent||0)}%</div>
-            </div>
-
-            <p class="subLine">
-              ID: <b>${esc(li.id)}</b> &nbsp;&nbsp;
-              SKU: <b>${esc(li.sku)}</b> &nbsp;&nbsp;
-              К-сть: <b>${Number(li.qty||0)}</b>
-            </p>
-
-            <div class="tagRow">
-              <span class="tag">Current: ${esc(li.current || "—")}</span>
-              <span class="tag">Next: ${esc(li.next || "—")}</span>
-              <span class="tag">Остання зміна: ${esc(upd)}</span>
-            </div>
-
-            <p class="desc">
-              Натисни “READ MORE”, щоб побачити всі процеси та статус кожної задачі.
-            </p>
-
-            <span class="statusPill ${cls}">
-              <span class="stDot"></span> ${esc(statusLabel(li.status))}
-            </span>
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div class="thumb">
+            ${li.thumb_url ? `<img src="${esc(li.thumb_url)}" alt="">` : `<div class="emoji">${esc(li.thumb_emoji || "📦")}</div>`}
           </div>
 
-          <a class="readMore" href="javascript:void(0)">READ MORE</a>
+          <div class="itemMain">
+            <div class="titleRow">
+              <p class="itemTitle">${esc(li.title)}</p>
+              <span class="statusPill ${stCls}">
+                <span class="sDot"></span> ${esc(statusLabel(li.status))}
+              </span>
+            </div>
+
+            <div class="sub">
+              <span>SKU: <b>${esc(li.sku)}</b></span>
+              <span>К-сть: <b>${safeNum(li.qty, 0)}</b></span>
+              <span class="chip">Current: <strong>${esc(li.current || "—")}</strong></span>
+              <span class="chip">Next: <strong>${esc(li.next || "—")}</strong></span>
+              <span class="chip">Час зміни: <strong>${esc(changed)}</strong></span>
+            </div>
+          </div>
+
+          <div class="itemRight">
+            <div class="smallLabel">Прогрес</div>
+            <div class="miniBar ${barCls}">
+              <div style="width:${pct}%"></div>
+            </div>
+            <div class="smallLabel">${pct}%</div>
+          </div>
         `;
 
-        card.addEventListener("click", ()=> openDetails(li));
-        grid.appendChild(card);
+        el.addEventListener("click", ()=> openDetails(li));
+        root.appendChild(el);
       });
     }
 
-    // ===== Drawer =====
     function openDetails(li){
       $("overlay").classList.add("show");
       $("overlay").setAttribute("aria-hidden","false");
 
       $("drawerTitle").textContent = li.title;
 
-      const upd = li.changed_last || latestChangedAt(li.tasks);
-      const cls = statusClass(li.status);
+      const stCls = statusClass(li.status);
 
       $("drawerMeta").innerHTML = `
         <span>ID: <b>${esc(li.id)}</b></span>
         <span>SKU: <b>${esc(li.sku)}</b></span>
-        <span>К-сть: <b>${Number(li.qty||0)}</b></span>
-        <span>Остання зміна: <b>${esc(upd)}</b></span>
-        <span class="statusPill ${cls}" style="padding:7px 10px; font-size:11px;"><span class="stDot"></span> ${esc(statusLabel(li.status))}</span>
+        <span>К-сть: <b>${safeNum(li.qty,0)}</b></span>
+        <span>Остання зміна: <b>${esc(li.changed_last || "—")}</b></span>
+        <span class="statusPill ${stCls}" style="padding:7px 10px; font-size:11px;">
+          <span class="sDot"></span> ${esc(statusLabel(li.status))}
+        </span>
       `;
 
       $("drawerSub").innerHTML = `
         <span>Current: <b>${esc(li.current || "—")}</b></span>
         <span>Next: <b>${esc(li.next || "—")}</b></span>
+        <span>Прогрес: <b>${safeNum(li.percent,0)}%</b></span>
       `;
 
-      const tasks = $("tasks");
-      tasks.innerHTML = "";
+      const tasksRoot = $("tasks");
+      tasksRoot.innerHTML = "";
 
-      const list = (li.tasks || []);
-      if(!list.length){
-        tasks.innerHTML = `<div class="empty">Немає задач по цій позиції</div>`;
+      const tasks = li.tasks || [];
+      if(!tasks.length){
+        tasksRoot.innerHTML = `<div class="empty">Немає задач по цій позиції</div>`;
         return;
       }
 
-      list.forEach(t=>{
-        const tcls = statusClass(t.status);
-        const dotCls = tcls;
+      tasks.forEach(t=>{
+        const tCls = statusClass(t.status);
+        const dotStyle = dotClass(t.status);
 
         const row = document.createElement("div");
         row.className = "task";
         row.innerHTML = `
           <div class="taskLeft">
-            <div class="taskDot ${dotCls}"></div>
-            <div>
-              <p class="taskName">${esc(t.name)}</p>
-              <p class="taskNote">${esc(t.note || "—")}</p>
+            <div class="tDot" style="${dotStyle}"></div>
+            <div style="min-width:0">
+              <p class="tName">${esc(t.name)}</p>
+              <p class="tNote">${esc(t.note || "—")}</p>
             </div>
           </div>
-
           <div class="taskRight">
-            <span class="statusPill ${tcls}" style="padding:7px 10px; font-size:11px;">
-              <span class="stDot"></span> ${esc(statusLabel(t.status))}
+            <span class="statusPill ${tCls}" style="padding:7px 10px; font-size:11px;">
+              <span class="sDot"></span> ${esc(statusLabel(t.status))}
             </span>
-            <span class="time">${esc(t.changed_at || "—")}</span>
+            <span class="tTime">${esc(t.changed_at || "—")}</span>
           </div>
         `;
-        tasks.appendChild(row);
+        tasksRoot.appendChild(row);
       });
     }
 
@@ -862,31 +892,37 @@
       $("overlay").setAttribute("aria-hidden","true");
     }
 
-    // ===== Search stub (demo) =====
-    function searchByExternalId(externalId){
-      const clone = JSON.parse(JSON.stringify(DEMO));
-      clone.order.external_order_id = externalId || DEMO.order.external_order_id;
-      return clone;
+    async function onSearch(){
+      clearError();
+      const externalId = $("q").value.trim();
+      if(!externalId){
+        showError("Введи номер замовлення (external_order_id), напр. O-AW-3918");
+        return;
+      }
+
+      try{
+        const data = await fetchOrder(externalId);
+        render(data);
+      }catch(e){
+        console.error(e);
+        showError(e?.message || "Помилка. Перевір номер замовлення або API.");
+        $("orderBox").style.display = "none";
+      }
     }
 
-    // ===== Events =====
-    $("btnSearch").addEventListener("click", ()=>{
-      const id = $("q").value.trim();
-      if(!id){ alert("Введи номер замовлення (external_order_id)."); return; }
-      render(searchByExternalId(id));
-    });
-
+    // Events
+    $("btnSearch").addEventListener("click", onSearch);
     $("btnDemo").addEventListener("click", ()=>{
       $("q").value = DEMO.order.external_order_id;
       render(DEMO);
+      clearError();
     });
-
-    $("q").addEventListener("keydown",(e)=>{ if(e.key==="Enter") $("btnSearch").click(); });
+    $("q").addEventListener("keydown",(e)=>{ if(e.key==="Enter") onSearch(); });
     $("btnClose").addEventListener("click", closeDetails);
     $("overlay").addEventListener("click",(e)=>{ if(e.target === $("overlay")) closeDetails(); });
     window.addEventListener("keydown",(e)=>{ if(e.key==="Escape") closeDetails(); });
 
-    // Init
+    // Init with demo so page never "white screens"
     render(DEMO);
   </script>
 </body>
