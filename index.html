@@ -257,17 +257,29 @@
       flex:1;
       min-width:0;
     }
+
+    /* --- FIXED layout: title + status aligned, chips ordered --- */
     .titleRow{
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
-      gap: 10px;
+      gap: 12px;
+    }
+    .titleBlock{
+      flex:1;
+      min-width:0;
     }
     .itemTitle{
       margin:0;
       font-size: 15px;
       font-weight: 900;
       line-height:1.25;
+    }
+    .skuLine{
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
     }
 
     .statusPill{
@@ -281,6 +293,10 @@
       border: 1px solid var(--line);
       background:#fff;
       white-space: nowrap;
+
+      flex: 0 0 auto;        /* ключове: не стискається */
+      align-self: flex-start; /* не зʼїжджає вниз */
+      margin-left: 10px;
     }
     .statusPill .sDot{ width:9px;height:9px;border-radius:999px;background: var(--gray); }
 
@@ -299,31 +315,31 @@
     .st-canceled{ color:#475569; border-color: rgba(148,163,184,.35); }
     .st-canceled .sDot{ background: var(--gray); }
 
-    .sub{
-      margin-top: 8px;
+    .chipsRow{
+      margin-top: 10px;
       display:flex;
       flex-wrap:wrap;
-      gap: 8px 14px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 650;
-      min-width:0;
+      gap: 8px 10px;
+      align-items:center;
     }
-    .sub b{ color: var(--text); font-weight: 850; }
 
-    .sub .chip{
+    .chip{
       display:inline-flex;
       gap:6px;
       align-items:center;
-      padding: 7px 10px;
+      padding: 8px 12px;
       border-radius: 999px;
       border: 1px solid var(--line2);
       background:#fff;
       font-weight: 750;
       color:#475569;
+      white-space: nowrap;
       max-width: 100%;
     }
-    .sub .chip strong{ color:var(--text); font-weight: 900; }
+    .chip strong{
+      color: var(--text);
+      font-weight: 900;
+    }
 
     .itemRight{
       width: 220px;
@@ -518,7 +534,6 @@
       background:#fff;
     }
 
-    /* Prevent white screen from silent errors */
     .errorBox{
       margin-top: 10px;
       padding: 12px 14px;
@@ -740,7 +755,6 @@
       const data = JSON.parse(JSON.stringify(DEMO));
       data.order.external_order_id = externalId;
 
-      // You can simulate "not found"
       if(!externalId || externalId.length < 3) {
         throw new Error("Введи коректний номер замовлення.");
       }
@@ -800,15 +814,18 @@
 
           <div class="itemMain">
             <div class="titleRow">
-              <p class="itemTitle">${esc(li.title)}</p>
+              <div class="titleBlock">
+                <p class="itemTitle">${esc(li.title)}</p>
+                <div class="skuLine">SKU: <b>${esc(li.sku)}</b></div>
+              </div>
+
               <span class="statusPill ${stCls}">
                 <span class="sDot"></span> ${esc(statusLabel(li.status))}
               </span>
             </div>
 
-            <div class="sub">
-              <span>SKU: <b>${esc(li.sku)}</b></span>
-              <span>К-сть: <b>${safeNum(li.qty, 0)}</b></span>
+            <div class="chipsRow">
+              <span class="chip">К-сть: <strong>${safeNum(li.qty, 0)}</strong></span>
               <span class="chip">Current: <strong>${esc(li.current || "—")}</strong></span>
               <span class="chip">Next: <strong>${esc(li.next || "—")}</strong></span>
               <span class="chip">Час зміни: <strong>${esc(changed)}</strong></span>
