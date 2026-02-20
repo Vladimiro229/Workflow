@@ -5,63 +5,74 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Hesh Workflow</title>
 
-  <!-- Editorial serif (як у прикладі) -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Clean UI font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      /* Light, crisp */
-      --bg:#f5f6f8;
-      --card:#ffffff;
-      --text:#0a0a0a;
-      --muted:#586174;
+      --bg:#ffffff;
+      --panel:#ffffff;
 
-      --line: rgba(10,10,10,.12);
-      --line2: rgba(10,10,10,.08);
+      --text:#121826;
+      --muted:#6b7280;
 
-      /* Status */
-      --green:#16a34a;
-      --greenBg:#e8f7ee;
-      --greenLine:#9fe3b8;
+      --line:#e8eaef;
+      --line2:#eef0f5;
 
-      --blue:#2563eb;
-      --blueBg:#eaf1ff;
-      --blueLine:#a9c2ff;
+      --accent:#3b5bdc;         /* blue like sample */
+      --accent2:#2f4fd6;
 
-      --orange:#d97706;
-      --orangeBg:#fff3e6;
-      --orangeLine:#ffd1a3;
+      --success:#1f9d55;
+      --warn:#c77800;
+      --danger:#c03a3a;
+      --neutral:#6b7280;
 
-      --red:#dc2626;
-      --redBg:#ffecec;
-      --redLine:#ffb8b8;
-
-      --gray:#64748b;
-      --grayBg:#f1f5f9;
-      --grayLine:#cbd5e1;
-
-      --shadow: 0 18px 50px rgba(0,0,0,.08);
-      --shadow2: 0 10px 28px rgba(0,0,0,.07);
-
-      --r:18px;
-      --r2:16px;
-
-      --serif: "Playfair Display", Georgia, serif;
-      --ui: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --r:16px;
+      --shadow: 0 14px 40px rgba(18,24,38,.08);
+      --shadow2: 0 10px 22px rgba(18,24,38,.06);
     }
 
     *{ box-sizing:border-box; }
+    html,body{ height:100%; }
     body{
       margin:0;
       background:var(--bg);
       color:var(--text);
-      font-family:var(--ui);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      letter-spacing: .1px;
     }
+
+    /* ===== Layout ===== */
     .wrap{
-      max-width: 1040px;
+      max-width: 1120px;
       margin: 0 auto;
-      padding: 22px 16px 70px;
+      padding: 26px 18px 90px;
+    }
+
+    .topLine{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 220px;
+    }
+    .mark{
+      width: 14px; height: 14px;
+      border:2px solid var(--accent);
+      border-radius: 4px;
+    }
+    .brand b{
+      font-weight:800;
+      letter-spacing:.2px;
     }
 
     /* ===== Search ===== */
@@ -69,289 +80,328 @@
       display:flex;
       gap:12px;
       align-items:center;
-      margin: 6px 0 18px;
+      margin: 14px 0 18px;
     }
-    .searchBox{
+    .search{
       flex:1;
       display:flex;
       align-items:center;
-      gap:12px;
-      background: var(--card);
-      border: 1px solid var(--line);
+      gap:10px;
+      border:1px solid var(--line);
       border-radius: 999px;
       padding: 14px 16px;
+      background: #fff;
       box-shadow: var(--shadow2);
     }
-    .searchBox .icon{ font-size:18px; opacity:.85; }
-    .searchBox input{
+    .search .icon{ color:var(--accent); font-weight:900; }
+    .search input{
       width:100%;
       border:0;
       outline:0;
       background:transparent;
-      font-size:16px;
-      font-weight:800;
-      letter-spacing:.2px;
+      font-size: 16px;
+      font-weight: 600;
       color: var(--text);
     }
-    .searchBox input::placeholder{
-      color:#9aa3b2;
-      font-weight:800;
-    }
+    .search input::placeholder{ color:#9aa3b2; font-weight:600; }
+
     .btn{
-      border: 1px solid rgba(0,0,0,.75);
-      background:#0a0a0a;
-      color:#fff;
+      border:1px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
       padding: 14px 18px;
-      border-radius:999px;
-      font-weight:900;
-      font-size:14px;
+      border-radius: 999px;
+      font-weight: 800;
       cursor:pointer;
-      box-shadow: var(--shadow2);
+      letter-spacing:.2px;
+      text-transform: uppercase;
+      font-size: 12px;
     }
-    .btn:hover{ filter:brightness(1.05); }
-    .btn:active{ transform:translateY(1px); }
-    .btn.ghost{
-      background:#fff;
-      color:var(--text);
-      border: 1px solid var(--line);
+    .btn:hover{
+      background: rgba(59,91,220,.06);
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+    .btnSolid{
+      border:1px solid var(--accent);
+      background: var(--accent);
+      color:#fff;
+    }
+    .btnSolid:hover{
+      background: var(--accent2);
+      border-color: var(--accent2);
+      color:#fff;
     }
 
-    /* ===== Order card ===== */
-    .card{
-      background: var(--card);
-      border: 1px solid var(--line);
+    /* ===== Order header ===== */
+    .orderBox{
+      border:1px solid var(--line);
       border-radius: var(--r);
+      background: var(--panel);
       box-shadow: var(--shadow);
-      overflow:hidden;
+      padding: 18px;
     }
-    .cardBd{ padding: 18px; }
 
-    .orderTop{
+    .orderTitle{
       display:flex;
       justify-content:space-between;
+      gap:12px;
       align-items:flex-start;
-      gap:14px;
       flex-wrap:wrap;
-    }
-    .orderId{
-      font-family: var(--mono);
-      font-weight: 950;
-      font-size: 18px;
-      letter-spacing:.4px;
-    }
-    .metaRow{
-      margin-top:10px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px 16px;
-      color: var(--muted);
-      font-size: 15px;
-      font-weight:700;
-    }
-    .metaRow b{
-      color:var(--text);
-      font-weight:950;
+      margin-bottom: 8px;
     }
 
-    .pillSync{
+    .orderId{
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing:.3px;
+    }
+    .meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px 18px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .meta b{ color: var(--text); font-weight: 800; }
+
+    .sync{
       display:inline-flex;
       align-items:center;
-      gap:10px;
+      gap:8px;
       padding: 10px 12px;
-      border-radius:999px;
-      border: 1px solid var(--greenLine);
-      background: var(--greenBg);
-      color: #0f6b30;
-      font-weight:950;
-      font-size:13px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-weight: 800;
+      color: var(--text);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing:.3px;
       white-space:nowrap;
     }
-    .dot{
-      width:9px;height:9px;border-radius:999px;
-      background: var(--green);
-      box-shadow:0 0 0 6px rgba(22,163,74,.10);
+    .syncDot{
+      width: 10px; height: 10px;
+      border-radius: 999px;
+      background: var(--success);
+      box-shadow: 0 0 0 6px rgba(31,157,85,.10);
     }
 
     .progressRow{
+      margin-top: 14px;
       display:flex;
       align-items:center;
       gap:12px;
-      margin-top: 12px;
     }
     .bar{
       flex:1;
-      height: 10px;
-      border-radius:999px;
+      height: 8px;
+      background: #f0f2f7;
+      border: 1px solid var(--line2);
+      border-radius: 999px;
       overflow:hidden;
-      background: rgba(0,0,0,.08);
-      border:1px solid rgba(0,0,0,.10);
     }
     .bar > div{
       height:100%;
       width:0%;
-      background:#0a0a0a;
-      border-radius:999px;
+      background: var(--accent);
       transition: width .35s ease;
     }
     .pct{
-      min-width:58px;
+      min-width:56px;
       text-align:right;
-      font-family: var(--mono);
-      font-size: 13px;
+      font-weight: 800;
       color: var(--muted);
-      font-weight:950;
+      font-size: 12px;
+      letter-spacing:.2px;
+      text-transform: uppercase;
     }
 
+    /* ===== Section ===== */
     .sectionHead{
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line2);
       display:flex;
       justify-content:space-between;
+      gap:12px;
       align-items:flex-end;
-      margin: 18px 0 10px;
-      padding-top: 14px;
-      border-top: 1px solid var(--line2);
     }
     .sectionHead h3{
       margin:0;
-      font-family: var(--serif);
-      font-size: 22px;
-      font-weight: 600;
-      letter-spacing:.1px;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+      color: var(--text);
     }
-    .sectionHead small{
-      font-family: var(--mono);
-      font-size: 13px;
+    .summary{
+      font-size: 12px;
       color: var(--muted);
-      font-weight: 950;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing:.4px;
     }
 
-    /* ===== Items ===== */
-    .items{ display:flex; flex-direction:column; gap:12px; }
-
-    .item{
+    /* ===== Cards grid like your sample ===== */
+    .grid{
+      margin-top: 16px;
       display:grid;
-      grid-template-columns: 70px 1fr 240px;
-      gap: 16px;
-      padding: 16px;
-      border-radius: var(--r2);
-      border: 1px solid var(--line2);
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 640px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      border: 1px solid var(--line);
+      border-radius: var(--r);
       background:#fff;
-      cursor:pointer;
-      transition: transform .08s ease, border-color .12s ease, box-shadow .12s ease;
-    }
-    .item:hover{
-      transform: translateY(-1px);
-      border-color: var(--line);
+      padding: 18px 18px 16px;
       box-shadow: var(--shadow2);
-    }
-
-    .ico{
-      width:70px;height:70px;
-      border-radius: 18px;
-      border: 1px solid var(--line2);
-      background:#fbfbfb;
-      display:grid;
-      place-items:center;
-      font-size: 26px;
-    }
-
-    .itTop{
+      cursor:pointer;
+      transition: transform .08s ease, border-color .12s ease;
+      min-height: 240px;
       display:flex;
+      flex-direction:column;
       justify-content:space-between;
-      gap: 10px;
-      align-items:flex-start;
     }
-    .itTitle{
-      margin:0;
-      font-family: var(--serif);
-      font-size: 20px;
-      font-weight: 600;
+    .card:hover{
+      transform: translateY(-1px);
+      border-color: rgba(59,91,220,.25);
+    }
+
+    .kicker{
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin:0 0 10px;
       line-height: 1.15;
     }
 
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      padding: 9px 12px;
-      border-radius:999px;
-      font-weight: 950;
-      font-size: 13px;
-      border: 1px solid var(--grayLine);
-      background: var(--grayBg);
-      color: #334155;
-      white-space: nowrap;
+    .bigLine{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
     }
-    .pill.done{ border-color: var(--greenLine); background: var(--greenBg); color:#0f6b30; }
-    .pill.progress{ border-color: var(--blueLine); background: var(--blueBg); color:#1e4ed8; }
-    .pill.paused{ border-color: var(--orangeLine); background: var(--orangeBg); color:#925200; }
-    .pill.blocked{ border-color: var(--redLine); background: var(--redBg); color:#991b1b; }
-    .pill.canceled{ border-color: var(--grayLine); background: var(--grayBg); color:#334155; }
+    .percentBig{
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing:.6px;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space:nowrap;
+    }
 
-    .itSub{
-      margin-top: 10px;
+    .subLine{
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing:.35px;
+      margin: 0 0 12px;
+    }
+    .subLine b{
+      color: var(--text);
+      font-weight: 900;
+    }
+
+    .desc{
+      color: #7a8396;
+      font-size: 13px;
+      line-height: 1.55;
+      margin: 0 0 16px;
+      font-weight: 500;
+    }
+
+    .tagRow{
       display:flex;
       flex-wrap:wrap;
-      gap: 10px 14px;
+      gap:8px;
+      margin-bottom: 12px;
+    }
+    .tag{
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing:.35px;
       color: var(--muted);
-      font-size: 14px;
-      font-weight: 750;
-    }
-    .itSub b{ color:var(--text); font-weight:950; }
-    .mono{ font-family: var(--mono); }
-
-    .right{
-      display:flex;
-      flex-direction:column;
-      align-items:flex-end;
-      justify-content:center;
-      gap: 10px;
-    }
-    .miniBar{
-      width: 220px;
-      height: 10px;
-      border-radius:999px;
-      overflow:hidden;
-      background: rgba(0,0,0,.08);
-      border:1px solid rgba(0,0,0,.10);
-    }
-    .miniBar > div{
-      height:100%;
-      width:0%;
-      background:#0a0a0a;
-      border-radius:999px;
-      transition: width .35s ease;
-    }
-    .miniPct{
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--muted);
-      font-weight: 950;
-    }
-
-    @media (max-width: 980px){
-      .item{ grid-template-columns:70px 1fr; }
-      .right{ align-items:flex-start; }
-      .miniBar{ width:100%; }
-    }
-
-    .empty{
-      padding: 18px;
-      text-align:center;
-      color: var(--muted);
-      border:1px dashed rgba(0,0,0,.18);
-      border-radius: var(--r2);
       background:#fff;
-      font-size:14px;
-      font-weight:850;
     }
 
-    /* ===== Overlay + Drawer ===== */
+    .statusPill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing:.35px;
+      border: 1px solid var(--line);
+      background:#fff;
+      color: var(--text);
+      width: fit-content;
+    }
+    .stDot{
+      width:9px;height:9px;border-radius:999px;background: var(--neutral);
+    }
+    .statusPill.done{ border-color: rgba(31,157,85,.25); color: var(--success); }
+    .statusPill.done .stDot{ background: var(--success); }
+
+    .statusPill.progress{ border-color: rgba(59,91,220,.25); color: var(--accent); }
+    .statusPill.progress .stDot{ background: var(--accent); }
+
+    .statusPill.paused{ border-color: rgba(199,120,0,.25); color: var(--warn); }
+    .statusPill.paused .stDot{ background: var(--warn); }
+
+    .statusPill.blocked{ border-color: rgba(192,58,58,.25); color: var(--danger); }
+    .statusPill.blocked .stDot{ background: var(--danger); }
+
+    .statusPill.canceled{ border-color: rgba(107,114,128,.25); color: var(--neutral); }
+    .statusPill.canceled .stDot{ background: var(--neutral); }
+
+    .readMore{
+      margin-top: 10px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      text-decoration:none;
+      border-radius: 0;              /* like sample square-ish */
+      padding: 12px 14px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .9px;
+      text-transform: uppercase;
+      width: 170px;
+      background:#fff;
+    }
+    .readMore:hover{ background: rgba(59,91,220,.06); }
+
+    /* ===== Drawer ===== */
     .overlay{
-      position:fixed;
-      inset:0;
-      background: rgba(0,0,0,.35);
+      position: fixed;
+      inset: 0;
+      background: rgba(18,24,38,.28);
       display:none;
       justify-content:flex-end;
-      z-index: 50;
+      z-index: 60;
     }
     .overlay.show{ display:flex; }
 
@@ -359,111 +409,146 @@
       width: min(560px, 100%);
       height:100%;
       background:#fff;
-      border-left:1px solid var(--line);
-      box-shadow: -14px 0 40px rgba(0,0,0,.18);
+      border-left: 1px solid var(--line);
+      box-shadow: -16px 0 50px rgba(18,24,38,.20);
       display:flex;
       flex-direction:column;
     }
+
     .drawerHd{
-      padding: 16px 16px 14px;
-      border-bottom:1px solid var(--line2);
+      padding: 18px;
+      border-bottom: 1px solid var(--line2);
       display:flex;
       justify-content:space-between;
       gap:12px;
       align-items:flex-start;
     }
+
     .drawerTitle{
       margin:0;
-      font-family: var(--serif);
-      font-size: 22px;
-      font-weight: 650;
-      line-height:1.15;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing:.2px;
     }
+
     .drawerMeta{
-      margin-top:6px;
+      margin-top: 10px;
       display:flex;
       flex-wrap:wrap;
       gap: 8px 14px;
       color: var(--muted);
-      font-size: 13px;
-      font-weight: 800;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing:.35px;
     }
-    .drawerMeta b{ color: var(--text); font-weight: 950; }
+    .drawerMeta b{ color:var(--text); font-weight: 900; }
 
-    .closeBtn{
+    .xBtn{
       border:1px solid var(--line);
       background:#fff;
-      border-radius: 14px;
-      padding: 10px 12px;
-      font-weight: 950;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
       cursor:pointer;
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--text);
     }
-    .closeBtn:hover{ background:#fafafa; }
+    .xBtn:hover{ background:#fafafa; }
 
     .drawerSub{
-      padding: 12px 16px;
-      border-bottom:1px solid var(--line2);
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line2);
       display:flex;
       flex-wrap:wrap;
-      gap: 10px 14px;
-      font-size: 14px;
+      gap: 10px 16px;
+      font-size: 12px;
       color: var(--muted);
       font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing:.35px;
     }
-    .drawerSub b{ color:var(--text); font-weight:950; }
+    .drawerSub b{ color:var(--text); font-weight: 900; }
 
     .tasks{
-      padding: 14px 12px 18px;
+      padding: 16px 18px 26px;
       overflow:auto;
     }
 
     .task{
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      padding: 14px 14px;
+      background:#fff;
+      margin-bottom: 12px;
       display:flex;
       align-items:flex-start;
+      justify-content:space-between;
       gap: 12px;
-      padding: 14px;
-      border: 1px solid var(--line2);
-      border-radius: var(--r2);
-      background:#fff;
-      margin: 0 4px 12px;
+    }
+    .taskLeft{
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      min-width: 0;
     }
     .taskDot{
-      width:10px;height:10px;border-radius:999px;
-      margin-top:4px;
-      background: var(--gray);
-      flex:0 0 auto;
+      width: 10px; height: 10px;
+      border-radius: 999px;
+      margin-top: 5px;
+      background: var(--neutral);
+      flex: 0 0 auto;
     }
-    .taskDot.done{ background: var(--green); }
-    .taskDot.progress{ background: var(--blue); }
-    .taskDot.paused{ background: var(--orange); }
-    .taskDot.blocked{ background: var(--red); }
-    .taskDot.canceled{ background: var(--gray); }
+    .taskDot.done{ background: var(--success); }
+    .taskDot.progress{ background: var(--accent); }
+    .taskDot.paused{ background: var(--warn); }
+    .taskDot.blocked{ background: var(--danger); }
+    .taskDot.canceled{ background: var(--neutral); }
 
-    .taskMain{ flex:1; }
     .taskName{
-      margin:0 0 6px;
-      font-size: 15px;
-      font-weight: 950;
-      color: var(--text);
-    }
-    .taskNote{
       margin:0;
       font-size: 13px;
-      color: var(--muted);
-      font-weight: 750;
+      font-weight: 900;
+      letter-spacing:.35px;
+      text-transform: uppercase;
+      line-height: 1.25;
+      white-space: normal;
+      word-break: break-word;
+    }
+    .taskNote{
+      margin: 6px 0 0;
+      color:#7a8396;
+      font-size: 13px;
+      line-height: 1.5;
+      font-weight: 500;
     }
     .taskRight{
       display:flex;
       flex-direction:column;
       align-items:flex-end;
       gap: 8px;
-      min-width: 132px;
+      flex: 0 0 auto;
     }
-    .taskTime{
-      font-family: var(--mono);
-      font-size: 12px;
+    .time{
       color: var(--muted);
-      font-weight: 950;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing:.35px;
+      white-space:nowrap;
+    }
+
+    .empty{
+      border: 1px dashed rgba(59,91,220,.35);
+      padding: 16px;
+      border-radius: var(--r);
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing:.35px;
+      font-size: 12px;
+      background:#fff;
     }
   </style>
 </head>
@@ -471,39 +556,42 @@
 <body>
   <div class="wrap">
 
-    <!-- SEARCH -->
+    <div class="topLine">
+      <div class="brand">
+        <span class="mark"></span>
+        <b>Workflow</b>
+      </div>
+      <button class="btn btnSolid" id="btnDemo">Демо-дані</button>
+    </div>
+
     <div class="searchRow">
-      <div class="searchBox">
+      <div class="search">
         <div class="icon">🔎</div>
         <input id="q" placeholder="Напр.: O-AW-3918" autocomplete="off" />
       </div>
-      <button class="btn" id="btnSearch">Знайти</button>
-      <button class="btn ghost" id="btnDemo">Демо</button>
+      <button class="btn btnSolid" id="btnSearch">Знайти</button>
     </div>
 
-    <!-- ORDER -->
-    <div class="card" id="orderCard">
-      <div class="cardBd">
-        <div class="orderTop">
-          <div>
-            <div class="orderId" id="orderId">—</div>
-            <div class="metaRow" id="orderMeta"></div>
-          </div>
-          <div class="pillSync" id="syncPill"><span class="dot"></span> Sync: OK</div>
+    <div class="orderBox" id="orderBox">
+      <div class="orderTitle">
+        <div>
+          <div class="orderId" id="orderId">—</div>
+          <div class="meta" id="orderMeta"></div>
         </div>
-
-        <div class="progressRow">
-          <div class="bar"><div id="orderBar"></div></div>
-          <div class="pct" id="orderPct">—%</div>
-        </div>
-
-        <div class="sectionHead">
-          <h3>Позиції замовлення</h3>
-          <small id="itemsSummary">—</small>
-        </div>
-
-        <div class="items" id="items"></div>
+        <div class="sync" id="syncPill"><span class="syncDot"></span> Sync: OK</div>
       </div>
+
+      <div class="progressRow">
+        <div class="bar"><div id="orderBar"></div></div>
+        <div class="pct" id="orderPct">—%</div>
+      </div>
+
+      <div class="sectionHead">
+        <h3>Позиції замовлення</h3>
+        <div class="summary" id="itemsSummary">—</div>
+      </div>
+
+      <div class="grid" id="grid"></div>
     </div>
 
   </div>
@@ -511,23 +599,21 @@
   <!-- Drawer -->
   <div class="overlay" id="overlay" aria-hidden="true">
     <div class="drawer" role="dialog" aria-modal="true">
-
       <div class="drawerHd">
         <div>
           <p class="drawerTitle" id="drawerTitle">—</p>
           <div class="drawerMeta" id="drawerMeta"></div>
         </div>
-        <button class="closeBtn" id="btnClose">✕</button>
+        <button class="xBtn" id="btnClose" aria-label="Close">×</button>
       </div>
 
       <div class="drawerSub" id="drawerSub"></div>
-
       <div class="tasks" id="tasks"></div>
     </div>
   </div>
 
   <script>
-    // ===== DEMO data (поки без API) =====
+    // ===== DEMO DATA (поки без API) =====
     const DEMO = {
       order: {
         external_order_id: "O-AW-3918",
@@ -540,7 +626,6 @@
       line_items: [
         {
           id:"LI-1010-GREEN",
-          icon:"📦",
           title:"Коробочка тактична 1010 — індивідуальний дизайн",
           sku:"1010 Зелена",
           qty:1,
@@ -548,6 +633,7 @@
           percent:100,
           current:"Відправка товару",
           next:"—",
+          changed_last:"21.02.2026 22:00",
           tasks: [
             { name:"Створення макету", status:"Done", changed_at:"21.02.2026 10:12", note:"—" },
             { name:"Контроль макету", status:"Done", changed_at:"21.02.2026 10:40", note:"—" },
@@ -563,7 +649,6 @@
         },
         {
           id:"LI-AW055",
-          icon:"⌚",
           title:"Awarder 055 — індивідуальний дизайн",
           sku:"Silver-Black",
           qty:1,
@@ -571,6 +656,7 @@
           percent:58,
           current:"Збірка циферблата",
           next:"Контроль якості циферблата",
+          changed_last:"21.02.2026 14:02",
           tasks: [
             { name:"Створення макету", status:"Done", changed_at:"21.02.2026 09:30", note:"—" },
             { name:"Контроль макету", status:"Done", changed_at:"21.02.2026 10:05", note:"—" },
@@ -582,6 +668,22 @@
             { name:"Нанесення гравіювання", status:"Canceled", changed_at:"—", note:"Ще не запускали" },
             { name:"Контроль якості годинника", status:"Canceled", changed_at:"—", note:"Ще не запускали" },
             { name:"Відправка товару", status:"Canceled", changed_at:"—", note:"Ще не запускали" }
+          ]
+        },
+        {
+          id:"LI-AW022",
+          title:"Awarder 022 — індивідуальний дизайн",
+          sku:"Black",
+          qty:2,
+          status:"Blocked",
+          percent:22,
+          current:"Контроль макету",
+          next:"Друк на плівці",
+          changed_last:"21.02.2026 11:12",
+          tasks: [
+            { name:"Створення макету", status:"Done", changed_at:"21.02.2026 10:10", note:"—" },
+            { name:"Контроль макету", status:"Blocked", changed_at:"21.02.2026 11:12", note:"Потрібне узгодження" },
+            { name:"Друк на плівці", status:"Canceled", changed_at:"—", note:"Очікує" }
           ]
         }
       ]
@@ -620,7 +722,9 @@
     }
 
     function latestChangedAt(tasks){
-      const valid = (tasks||[]).map(t=>t.changed_at).filter(x=>x && x!=="—");
+      const valid = (tasks||[])
+        .map(t=>t.changed_at)
+        .filter(x=>x && x!=="—");
       return valid.length ? valid[valid.length-1] : "—";
     }
 
@@ -629,12 +733,12 @@
       $("orderId").textContent = data.order.external_order_id;
 
       $("orderMeta").innerHTML = `
-        <span>📅 Створено: <b>${esc(data.order.created_at)}</b></span>
-        <span>⏳ Дедлайн: <b>${esc(data.order.deadline)}</b></span>
-        <span>👤 Клієнт: <b>${esc(data.order.customer)}</b></span>
+        <span>Створено: <b>${esc(data.order.created_at)}</b></span>
+        <span>Дедлайн: <b>${esc(data.order.deadline)}</b></span>
+        <span>Клієнт: <b>${esc(data.order.customer)}</b></span>
       `;
 
-      $("syncPill").innerHTML = `<span class="dot"></span> Sync: ${esc(data.order.sync_status)}`;
+      $("syncPill").innerHTML = `<span class="syncDot"></span> Sync: ${esc(data.order.sync_status)}`;
 
       const op = Number(data.order.progress||0);
       $("orderBar").style.width = `${op}%`;
@@ -643,50 +747,55 @@
       const total = data.line_items.length;
       const inWork = data.line_items.filter(x=>x.status==="InProgress").length;
       const risks = data.line_items.filter(x=>x.status==="Blocked").length;
-
       $("itemsSummary").textContent = `К-сть позицій: ${total} · У роботі: ${inWork} · Ризики: ${risks}`;
 
-      const wrap = $("items");
-      wrap.innerHTML = "";
+      const grid = $("grid");
+      grid.innerHTML = "";
 
       if(!total){
-        wrap.innerHTML = `<div class="empty">Немає позицій у замовленні</div>`;
+        grid.innerHTML = `<div class="empty">Немає позицій у замовленні</div>`;
         return;
       }
 
       data.line_items.forEach(li=>{
-        const stCls = statusClass(li.status);
-        const updated = latestChangedAt(li.tasks);
+        const cls = statusClass(li.status);
+        const upd = li.changed_last || latestChangedAt(li.tasks);
 
-        const div = document.createElement("div");
-        div.className = "item";
-        div.innerHTML = `
-          <div class="ico">${esc(li.icon || "🧩")}</div>
-
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
           <div>
-            <div class="itTop">
-              <p class="itTitle">${esc(li.title)}</p>
-              <span class="pill ${stCls}">${statusLabel(li.status)}</span>
+            <div class="bigLine">
+              <p class="kicker">${esc(li.title)}</p>
+              <div class="percentBig">${Number(li.percent||0)}%</div>
             </div>
 
-            <div class="itSub">
-              <span>ID: <b class="mono">${esc(li.id)}</b></span>
-              <span>SKU: <b>${esc(li.sku)}</b></span>
-              <span>К-сть: <b>${Number(li.qty||0)}</b></span>
-              <span>Остання зміна: <b class="mono">${esc(updated)}</b></span>
-              <span>Current: <b>${esc(li.current || "—")}</b></span>
-              <span>Next: <b>${esc(li.next || "—")}</b></span>
+            <p class="subLine">
+              ID: <b>${esc(li.id)}</b> &nbsp;&nbsp;
+              SKU: <b>${esc(li.sku)}</b> &nbsp;&nbsp;
+              К-сть: <b>${Number(li.qty||0)}</b>
+            </p>
+
+            <div class="tagRow">
+              <span class="tag">Current: ${esc(li.current || "—")}</span>
+              <span class="tag">Next: ${esc(li.next || "—")}</span>
+              <span class="tag">Остання зміна: ${esc(upd)}</span>
             </div>
+
+            <p class="desc">
+              Натисни “READ MORE”, щоб побачити всі процеси та статус кожної задачі.
+            </p>
+
+            <span class="statusPill ${cls}">
+              <span class="stDot"></span> ${esc(statusLabel(li.status))}
+            </span>
           </div>
 
-          <div class="right">
-            <div class="miniBar"><div style="width:${Number(li.percent||0)}%"></div></div>
-            <div class="miniPct">${Number(li.percent||0)}%</div>
-          </div>
+          <a class="readMore" href="javascript:void(0)">READ MORE</a>
         `;
 
-        div.addEventListener("click", ()=> openDetails(li));
-        wrap.appendChild(div);
+        card.addEventListener("click", ()=> openDetails(li));
+        grid.appendChild(card);
       });
     }
 
@@ -697,15 +806,15 @@
 
       $("drawerTitle").textContent = li.title;
 
-      const updated = latestChangedAt(li.tasks);
-      const stCls = statusClass(li.status);
+      const upd = li.changed_last || latestChangedAt(li.tasks);
+      const cls = statusClass(li.status);
 
       $("drawerMeta").innerHTML = `
-        <span>ID: <b class="mono">${esc(li.id)}</b></span>
+        <span>ID: <b>${esc(li.id)}</b></span>
         <span>SKU: <b>${esc(li.sku)}</b></span>
         <span>К-сть: <b>${Number(li.qty||0)}</b></span>
-        <span>Остання зміна: <b class="mono">${esc(updated)}</b></span>
-        <span class="pill ${stCls}">${statusLabel(li.status)}</span>
+        <span>Остання зміна: <b>${esc(upd)}</b></span>
+        <span class="statusPill ${cls}" style="padding:7px 10px; font-size:11px;"><span class="stDot"></span> ${esc(statusLabel(li.status))}</span>
       `;
 
       $("drawerSub").innerHTML = `
@@ -723,20 +832,25 @@
       }
 
       list.forEach(t=>{
-        const cls = statusClass(t.status);
+        const tcls = statusClass(t.status);
+        const dotCls = tcls;
+
         const row = document.createElement("div");
         row.className = "task";
         row.innerHTML = `
-          <div class="taskDot ${cls}"></div>
-
-          <div class="taskMain">
-            <div class="taskName">${esc(t.name)}</div>
-            <p class="taskNote">${esc(t.note || "—")}</p>
+          <div class="taskLeft">
+            <div class="taskDot ${dotCls}"></div>
+            <div>
+              <p class="taskName">${esc(t.name)}</p>
+              <p class="taskNote">${esc(t.note || "—")}</p>
+            </div>
           </div>
 
           <div class="taskRight">
-            <span class="pill ${cls}">${statusLabel(t.status)}</span>
-            <span class="taskTime">${esc(t.changed_at || "—")}</span>
+            <span class="statusPill ${tcls}" style="padding:7px 10px; font-size:11px;">
+              <span class="stDot"></span> ${esc(statusLabel(t.status))}
+            </span>
+            <span class="time">${esc(t.changed_at || "—")}</span>
           </div>
         `;
         tasks.appendChild(row);
@@ -748,7 +862,7 @@
       $("overlay").setAttribute("aria-hidden","true");
     }
 
-    // ===== Search (demo stub) =====
+    // ===== Search stub (demo) =====
     function searchByExternalId(externalId){
       const clone = JSON.parse(JSON.stringify(DEMO));
       clone.order.external_order_id = externalId || DEMO.order.external_order_id;
@@ -758,7 +872,7 @@
     // ===== Events =====
     $("btnSearch").addEventListener("click", ()=>{
       const id = $("q").value.trim();
-      if(!id){ alert("Введіть номер замовлення (external_order_id)."); return; }
+      if(!id){ alert("Введи номер замовлення (external_order_id)."); return; }
       render(searchByExternalId(id));
     });
 
