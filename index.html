@@ -3,944 +3,1031 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Workflow — Hesh-like</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
+  <title>Awarder • Dashboard</title>
   <style>
     :root{
-      --bg:#f6f7fb;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --line:#e5e7ef;
-      --line2:#eef1f7;
+      --bg:#0b0f17;
+      --panel:#0f1624;
+      --panel2:#0c1321;
+      --line:rgba(255,255,255,.08);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.62);
 
-      --blue:#3b82f6;
-      --green:#22c55e;
-      --orange:#f59e0b;
-      --red:#ef4444;
-      --gray:#94a3b8;
+      --good:#26d07c;
+      --warn:#ffb020;
+      --bad:#ff4d6d;
 
-      --radius:16px;
-      --shadow: 0 10px 30px rgba(15,23,42,.08);
-      --shadow2: 0 6px 18px rgba(15,23,42,.06);
+      --chip:#101a2b;
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --shadow2: 0 10px 25px rgba(0,0,0,.35);
+
+      --r:18px;
     }
-
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+    *{box-sizing:border-box}
     body{
       margin:0;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      background:
+        radial-gradient(1200px 600px at 20% 0%, rgba(92,134,255,.22), transparent 60%),
+        radial-gradient(900px 500px at 85% 10%, rgba(39,208,171,.14), transparent 55%),
+        radial-gradient(700px 500px at 50% 120%, rgba(255,77,109,.10), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      min-height:100vh;
     }
 
     .wrap{
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 18px 16px 70px;
+      padding: 18px 14px 28px;
     }
 
-    /* ===== Top Search ===== */
-    .top{
-      position: sticky;
-      top:0;
-      z-index:10;
-      background: linear-gradient(to bottom, rgba(246,247,251,.98), rgba(246,247,251,.92));
-      backdrop-filter: blur(10px);
-      padding: 10px 0 14px;
-      margin-bottom: 10px;
-    }
-
-    .searchRow{
+    /* Header */
+    .topbar{
       display:flex;
-      gap: 12px;
       align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
     }
-
-    .search{
-      flex:1;
+    .brand{
       display:flex;
       align-items:center;
       gap:10px;
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      background: #fff;
-      border-radius: 999px;
-      box-shadow: var(--shadow2);
+      min-width: 200px;
     }
-    .search .icon{ color: var(--muted); }
-    .search input{
-      width:100%;
-      border:0;
-      outline:0;
-      font-size: 15px;
-      font-weight: 650;
-      color: var(--text);
-      background: transparent;
+    .logo{
+      width:40px;height:40px;border-radius:14px;
+      background:
+        linear-gradient(135deg, rgba(92,134,255,.9), rgba(39,208,171,.85));
+      box-shadow: 0 10px 30px rgba(39,208,171,.18);
+      position:relative;
+      overflow:hidden;
     }
-    .search input::placeholder{ color:#94a3b8; font-weight:600; }
+    .logo:after{
+      content:"";
+      position:absolute; inset:-30%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), transparent 55%);
+      transform: rotate(15deg);
+    }
+    .brand h1{
+      font-size: 16px;
+      margin:0;
+      letter-spacing:.2px;
+      line-height:1.1;
+    }
+    .brand .sub{
+      font-size: 12px;
+      color:var(--muted);
+      margin-top:2px;
+    }
 
-    .btn{
-      border: 1px solid transparent;
-      background: var(--blue);
-      color:#fff;
-      padding: 12px 16px;
+    .toolbar{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .pill{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--line);
       border-radius: 999px;
+      padding: 10px 12px;
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+    }
+    .pill input, .pill select{
+      background: transparent;
+      border:0;
+      outline:none;
+      color:var(--text);
+      font-size: 13px;
+      min-width: 140px;
+    }
+    .pill select option{ color:#111; }
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
       cursor:pointer;
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      font-weight: 600;
+      font-size: 13px;
+      transition: transform .08s ease, border-color .12s ease, background .12s ease;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.16); background: rgba(255,255,255,.06); }
+    .btn:active{ transform: translateY(0px); }
+    .btn.primary{
+      border-color: rgba(92,134,255,.35);
+      background: linear-gradient(135deg, rgba(92,134,255,.25), rgba(39,208,171,.14));
+    }
+
+    /* Summary blocks */
+    .grid4{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 14px 0 12px;
+    }
+    @media (max-width: 980px){
+      .grid4{ grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 520px){
+      .grid4{ grid-template-columns: 1fr; }
+      .brand{ min-width:auto; }
+    }
+
+    .stat{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      padding: 14px 14px;
+      box-shadow: var(--shadow2);
+      position:relative;
+      overflow:hidden;
+      min-height: 92px;
+    }
+    .stat:before{
+      content:"";
+      position:absolute;
+      inset:-40% -40% auto auto;
+      width:240px; height:240px;
+      background: radial-gradient(circle at 30% 30%, rgba(92,134,255,.20), transparent 60%);
+      filter: blur(0px);
+      transform: rotate(25deg);
+      pointer-events:none;
+    }
+    .stat .label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom: 6px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:99px;
+      background: rgba(255,255,255,.25);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.05);
+    }
+    .stat .value{
+      font-size: 22px;
       font-weight: 800;
       letter-spacing:.2px;
+      line-height:1.1;
+    }
+    .stat .hint{
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .chip{
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* Main layout */
+    .main{
+      display:grid;
+      grid-template-columns: 1fr 330px;
+      gap: 12px;
+      margin-top: 12px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .main{ grid-template-columns: 1fr; }
+    }
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panelHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 12px 12px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(0,0,0,.10);
+    }
+    .panelHead .title{
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .2px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .panelHead .title small{
+      font-weight:600;
+      color: var(--muted);
+    }
+    .panelBody{ padding: 10px; }
+
+    /* Table-like list (status alignment fix) */
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .row{
+      display:grid;
+      grid-template-columns: 92px 1fr 140px 120px;
+      gap:10px;
+      align-items:center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      border-radius: 16px;
       box-shadow: var(--shadow2);
     }
-    .btn:hover{ filter: brightness(.98); }
-    .btnGhost{
-      background:#fff;
-      border:1px solid var(--line);
-      color: var(--text);
-    }
-    .btnGhost:hover{ background:#fbfcff; }
-
-    /* ===== Cards ===== */
-    .card{
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+    @media (max-width: 980px){
+      .row{ grid-template-columns: 92px 1fr; grid-auto-rows:auto; }
+      .row .meta, .row .actions{ justify-self:start; }
+      .row .meta{ grid-column: 1 / -1; }
+      .row .actions{ grid-column: 1 / -1; }
     }
 
-    .orderHeader{
-      padding: 16px 16px 14px;
-      margin-top: 10px;
-    }
-
-    .orderTopLine{
+    /* Status column strictly left and stable */
+    .statusBox{
       display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+      align-items:center;
+      justify-content:flex-start; /* <— не їде вправо */
+      gap:10px;
+      min-width: 0;
     }
-
-    .orderId{
-      font-size: 20px;
-      font-weight: 900;
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius: 999px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      background: rgba(16,26,43,.65);
+      font-size: 12px;
+      font-weight: 800;
       letter-spacing:.2px;
+      white-space: nowrap;
+    }
+    .badge i{
+      width:10px;height:10px;border-radius: 999px;
+      display:inline-block;
+      background: rgba(255,255,255,.25);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.05);
+    }
+    .badge.good i{ background: rgba(38,208,124,.95); box-shadow: 0 0 0 4px rgba(38,208,124,.10); }
+    .badge.warn i{ background: rgba(255,176,32,.95); box-shadow: 0 0 0 4px rgba(255,176,32,.10); }
+    .badge.bad  i{ background: rgba(255,77,109,.95); box-shadow: 0 0 0 4px rgba(255,77,109,.12); }
+
+    .cardMain{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 0;
+    }
+    .thumb{
+      width:46px; height:46px; border-radius: 14px;
+      border:1px solid var(--line);
+      background: linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      overflow:hidden;
+      flex: 0 0 auto;
+      position:relative;
+    }
+    .thumb img{
+      width:100%; height:100%;
+      object-fit: cover;
+      display:block;
+      transform: scale(1.03);
+    }
+    .taskText{ min-width:0; }
+    .taskName{
+      font-weight: 900;
+      font-size: 13px;
+      margin:0;
+      line-height:1.15;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .taskSub{
+      margin-top:6px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      color: var(--muted);
+      font-size: 12px;
     }
 
     .meta{
       display:flex;
-      flex-wrap:wrap;
-      gap: 10px 16px;
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 650;
-    }
-    .meta b{ color: var(--text); font-weight: 850; }
-
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 9px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background:#fff;
-      font-weight: 850;
-      font-size: 12px;
-      color: var(--text);
-      white-space:nowrap;
-    }
-    .dot{
-      width:10px;height:10px;border-radius:999px;
-      background: var(--gray);
-      box-shadow: 0 0 0 5px rgba(148,163,184,.16);
-    }
-    .pill.ok{ border-color: rgba(34,197,94,.25); color: #15803d; }
-    .pill.ok .dot{ background: var(--green); box-shadow: 0 0 0 5px rgba(34,197,94,.16); }
-
-    .progressRow{
-      display:flex;
-      align-items:center;
-      gap: 12px;
-      margin-top: 14px;
-    }
-    .bar{
-      flex:1;
-      height: 10px;
-      background: #eef2ff;
-      border: 1px solid var(--line2);
-      border-radius: 999px;
-      overflow:hidden;
-    }
-    .bar > div{
-      height:100%;
-      width:0%;
-      background: linear-gradient(90deg, #60a5fa, #3b82f6);
-      transition: width .35s ease;
-    }
-    .pct{
-      min-width: 56px;
-      text-align:right;
-      color: var(--muted);
-      font-weight: 900;
-      font-size: 12px;
-    }
-
-    .sectionHead{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap: 12px;
-      padding: 14px 16px 0;
-      margin-top: 8px;
-    }
-    .sectionHead h3{
-      margin:0;
-      font-size: 14px;
-      font-weight: 950;
-      letter-spacing:.4px;
-    }
-    .summary{
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 850;
-    }
-
-    /* ===== Items list (Hesh-like rows) ===== */
-    .items{
-      padding: 12px 12px 14px;
-    }
-
-    .item{
-      display:flex;
-      gap: 12px;
-      padding: 14px;
-      border: 1px solid var(--line2);
-      border-radius: 14px;
-      background: #fff;
-      box-shadow: 0 4px 14px rgba(15,23,42,.05);
-      margin-bottom: 12px;
-      cursor:pointer;
-      transition: transform .08s ease, border-color .12s ease;
-      align-items: stretch;
-    }
-    .item:hover{
-      transform: translateY(-1px);
-      border-color: rgba(59,130,246,.22);
-    }
-
-    .thumb{
-      width: 54px;
-      height: 54px;
-      border-radius: 14px;
-      border: 1px solid var(--line2);
-      background: linear-gradient(180deg,#fbfcff,#f1f5ff);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex: 0 0 auto;
-      overflow:hidden;
-    }
-    .thumb img{
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      display:block;
-    }
-    .thumb .emoji{ font-size: 22px; color:#475569; }
-
-    .itemMain{
-      flex:1;
-      min-width:0;
-    }
-
-    /* --- FIXED layout: title + status aligned, chips ordered --- */
-    .titleRow{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap: 12px;
-    }
-    .titleBlock{
-      flex:1;
-      min-width:0;
-    }
-    .itemTitle{
-      margin:0;
-      font-size: 15px;
-      font-weight: 900;
-      line-height:1.25;
-    }
-    .skuLine{
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 650;
-    }
-
-    .statusPill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 12px;
-      border: 1px solid var(--line);
-      background:#fff;
-      white-space: nowrap;
-
-      flex: 0 0 auto;        /* ключове: не стискається */
-      align-self: flex-start; /* не зʼїжджає вниз */
-      margin-left: 10px;
-    }
-    .statusPill .sDot{ width:9px;height:9px;border-radius:999px;background: var(--gray); }
-
-    .st-done{ color:#15803d; border-color: rgba(34,197,94,.25); }
-    .st-done .sDot{ background: var(--green); }
-
-    .st-progress{ color:#1d4ed8; border-color: rgba(59,130,246,.25); }
-    .st-progress .sDot{ background: var(--blue); }
-
-    .st-paused{ color:#b45309; border-color: rgba(245,158,11,.25); }
-    .st-paused .sDot{ background: var(--orange); }
-
-    .st-blocked{ color:#b91c1c; border-color: rgba(239,68,68,.25); }
-    .st-blocked .sDot{ background: var(--red); }
-
-    .st-canceled{ color:#475569; border-color: rgba(148,163,184,.35); }
-    .st-canceled .sDot{ background: var(--gray); }
-
-    .chipsRow{
-      margin-top: 10px;
-      display:flex;
-      flex-wrap:wrap;
-      gap: 8px 10px;
-      align-items:center;
-    }
-
-    .chip{
-      display:inline-flex;
+      flex-direction:column;
       gap:6px;
-      align-items:center;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--line2);
-      background:#fff;
-      font-weight: 750;
-      color:#475569;
-      white-space: nowrap;
-      max-width: 100%;
-    }
-    .chip strong{
-      color: var(--text);
-      font-weight: 900;
-    }
-
-    .itemRight{
-      width: 220px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      gap:10px;
-      flex: 0 0 auto;
-      padding-left: 4px;
-    }
-
-    .smallLabel{
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing:.2px;
-      text-transform: uppercase;
+      justify-self:end;
       text-align:right;
     }
-    .miniBar{
-      height: 8px;
-      border-radius: 999px;
-      background:#f1f5f9;
-      border: 1px solid var(--line2);
-      overflow:hidden;
-    }
-    .miniBar > div{
-      height:100%;
-      width:0%;
-      background: linear-gradient(90deg, rgba(34,197,94,.9), rgba(34,197,94,.55));
-      transition: width .35s ease;
-    }
-    .miniBar.blue > div{
-      background: linear-gradient(90deg, rgba(59,130,246,.9), rgba(59,130,246,.55));
-    }
-    .miniBar.orange > div{
-      background: linear-gradient(90deg, rgba(245,158,11,.95), rgba(245,158,11,.55));
-    }
-    .miniBar.red > div{
-      background: linear-gradient(90deg, rgba(239,68,68,.9), rgba(239,68,68,.55));
-    }
-
-    @media (max-width: 860px){
-      .item{ flex-direction:column; }
-      .itemRight{ width:100%; }
-      .smallLabel{ text-align:left; }
-    }
-
-    /* ===== Drawer (details) ===== */
-    .overlay{
-      position: fixed;
-      inset: 0;
-      background: rgba(15,23,42,.35);
-      display:none;
-      justify-content:flex-end;
-      z-index: 60;
-    }
-    .overlay.show{ display:flex; }
-
-    .drawer{
-      width: min(520px, 100%);
-      height: 100%;
-      background: #fff;
-      border-left: 1px solid var(--line);
-      box-shadow: -16px 0 50px rgba(15,23,42,.25);
-      display:flex;
-      flex-direction:column;
-    }
-
-    .drawerHd{
-      padding: 16px 16px 12px;
-      border-bottom: 1px solid var(--line2);
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:flex-start;
-    }
-    .drawerTitle{
-      margin:0;
-      font-size: 16px;
-      font-weight: 950;
-      line-height:1.2;
-    }
-    .drawerMeta{
-      margin-top: 10px;
-      display:flex;
-      flex-wrap:wrap;
-      gap: 8px 12px;
-      color: var(--muted);
+    .meta .due{
       font-size: 12px;
-      font-weight: 650;
+      color: var(--muted);
     }
-    .drawerMeta b{ color:var(--text); font-weight: 900; }
+    .meta .prio{
+      font-size: 12px;
+      font-weight:900;
+    }
 
-    .close{
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      border: 1px solid var(--line2);
-      background:#fff;
+    .actions{
+      display:flex;
+      gap:8px;
+      justify-self:end;
+      align-items:center;
+    }
+    .chk{
+      display:flex;
+      align-items:center;
+      gap:8px;
       cursor:pointer;
-      font-size: 18px;
-      font-weight: 900;
+      user-select:none;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .chk input{
+      width:18px; height:18px;
+      accent-color: #5c86ff;
+      cursor:pointer;
+    }
+
+    .miniBtn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
       color: var(--text);
-    }
-    .close:hover{ background:#fbfcff; }
-
-    .drawerSub{
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--line2);
-      display:flex;
-      flex-wrap:wrap;
-      gap: 10px 14px;
-      color: var(--muted);
+      padding: 9px 10px;
+      border-radius: 12px;
+      cursor:pointer;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 800;
+      transition: transform .08s ease, background .12s ease, border-color .12s ease;
     }
-    .drawerSub b{ color: var(--text); font-weight: 900; }
+    .miniBtn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.16); }
+    .miniBtn:active{ transform: translateY(0px); }
 
-    .legend{
-      padding: 10px 16px 0;
-      display:flex;
-      flex-wrap:wrap;
-      gap: 8px;
-    }
-    .legend .pill{ padding: 7px 10px; font-size: 11px; border-color: var(--line2); }
-
-    .tasks{
-      padding: 12px 16px 20px;
-      overflow:auto;
-    }
-
-    .task{
-      border: 1px solid var(--line2);
-      border-radius: 14px;
-      padding: 12px;
-      background:#fff;
-      display:flex;
-      justify-content:space-between;
-      gap: 12px;
-      align-items:flex-start;
-      margin-bottom: 10px;
-    }
-    .taskLeft{
-      display:flex;
-      gap: 10px;
-      min-width:0;
-    }
-    .tDot{
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      margin-top: 5px;
-      background: var(--gray);
-      flex: 0 0 auto;
-    }
-    .tName{
-      margin:0;
-      font-size: 13px;
-      font-weight: 900;
-      line-height:1.25;
-      word-break: break-word;
-    }
-    .tNote{
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 550;
-      line-height:1.45;
-    }
-
-    .taskRight{
+    /* Side panel */
+    .sideGrid{
       display:flex;
       flex-direction:column;
-      align-items:flex-end;
-      gap: 8px;
-      flex: 0 0 auto;
+      gap:12px;
     }
-    .tTime{
-      color: var(--muted);
+    .formRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    label{
       font-size: 12px;
-      font-weight: 850;
-      white-space:nowrap;
+      color: var(--muted);
+    }
+    input[type="text"], input[type="date"], select, textarea{
+      width:100%;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      padding: 10px 11px;
+      outline:none;
+      font-size: 13px;
+      box-shadow: var(--shadow2);
+    }
+    textarea{ min-height: 84px; resize: vertical; }
+    .hintLine{
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
     }
 
-    .empty{
-      border: 1px dashed rgba(59,130,246,.35);
-      border-radius: 14px;
-      padding: 14px;
-      color: var(--muted);
-      font-weight: 750;
-      background:#fff;
-    }
-
-    .errorBox{
-      margin-top: 10px;
-      padding: 12px 14px;
-      border: 1px solid rgba(239,68,68,.25);
-      background: #fff;
-      border-radius: 14px;
-      color:#b91c1c;
-      font-weight: 750;
-      display:none;
-    }
-    .errorBox.show{ display:block; }
-    .mutedNote{
+    .foot{
+      margin-top: 14px;
       color: var(--muted);
       font-size: 12px;
-      font-weight: 650;
-      margin-top: 8px;
+      text-align:center;
     }
+
+    /* Completed style */
+    .row.done{
+      opacity: .62;
+      filter: saturate(.85);
+    }
+    .row.done .taskName{ text-decoration: line-through; }
+    .row.done .badge{ background: rgba(255,255,255,.03); }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <div class="top">
-      <div class="searchRow">
-        <div class="search">
-          <div class="icon">🔎</div>
-          <input id="q" placeholder="Напр.: O-AW-3918" autocomplete="off" />
-        </div>
-        <button class="btn" id="btnSearch">Знайти</button>
-        <button class="btn btnGhost" id="btnDemo">Демо</button>
-      </div>
-      <div class="errorBox" id="err"></div>
-    </div>
-
-    <!-- Order -->
-    <div class="card orderHeader" id="orderBox" style="display:none;">
-      <div class="orderTopLine">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
         <div>
-          <div class="orderId" id="orderId">—</div>
-          <div class="meta" id="orderMeta"></div>
+          <h1>Awarder • Production Dashboard</h1>
+          <div class="sub" id="nowLine">—</div>
         </div>
-        <div class="pill ok" id="syncPill"><span class="dot"></span> Sync: OK</div>
       </div>
 
-      <div class="progressRow">
-        <div class="bar"><div id="orderBar"></div></div>
-        <div class="pct" id="orderPct">—%</div>
-      </div>
-
-      <div class="sectionHead">
-        <h3>Позиції замовлення</h3>
-        <div class="summary" id="itemsSummary">—</div>
-      </div>
-
-      <div class="items" id="items"></div>
-    </div>
-
-    <div class="mutedNote">
-      Натисни на позицію — справа відкриється детальний Workflow з усіма задачами, їх статусом і часом зміни.
-    </div>
-  </div>
-
-  <!-- Drawer -->
-  <div class="overlay" id="overlay" aria-hidden="true">
-    <div class="drawer" role="dialog" aria-modal="true">
-      <div class="drawerHd">
-        <div>
-          <p class="drawerTitle" id="drawerTitle">—</p>
-          <div class="drawerMeta" id="drawerMeta"></div>
+      <div class="toolbar">
+        <div class="pill" title="Пошук по завданнях">
+          🔎 <input id="q" type="text" placeholder="Пошук (модель, текст)..." />
         </div>
-        <button class="close" id="btnClose" aria-label="Close">×</button>
+        <div class="pill" title="Фільтр по статусу">
+          ⛭
+          <select id="statusFilter">
+            <option value="all">Всі</option>
+            <option value="todo">До роботи</option>
+            <option value="doing">В роботі</option>
+            <option value="done">Виконано</option>
+          </select>
+        </div>
+        <button class="btn primary" id="resetBtn">Скинути</button>
       </div>
-
-      <div class="drawerSub" id="drawerSub"></div>
-
-      <div class="legend">
-        <span class="statusPill st-done"><span class="sDot"></span> Виконано</span>
-        <span class="statusPill st-progress"><span class="sDot"></span> У роботі</span>
-        <span class="statusPill st-paused"><span class="sDot"></span> На паузі</span>
-        <span class="statusPill st-blocked"><span class="sDot"></span> Заблоковано</span>
-        <span class="statusPill st-canceled"><span class="sDot"></span> Скасовано</span>
-      </div>
-
-      <div class="tasks" id="tasks"></div>
     </div>
-  </div>
 
-  <script>
-    /*********************************************************
-     * IMPORTANT (for your IT)
-     * Hesh API tokens SHOULD NOT be used directly in browser.
-     * Make a backend/proxy endpoint like /api/order?externalId=...
-     * and return a normalized JSON in the same structure as DEMO.
-     *********************************************************/
+    <!-- TOP BLOCKS (order exactly: К-сть.. Поточне завдання. Наступне завдання. Час зміни.) -->
+    <div class="grid4">
+      <div class="stat">
+        <div class="label"><span class="dot"></span> К-сть</div>
+        <div class="value" id="kQty">0</div>
+        <div class="hint">
+          <span class="chip" id="kTodo">До роботи: 0</span>
+          <span class="chip" id="kDone">Виконано: 0</span>
+        </div>
+      </div>
 
-    const DEMO = {
-      order: {
-        external_order_id: "O-AW-3918",
-        created_at: "21.02.2026",
-        deadline: "13.02.2026",
-        customer: "Марина Awarder",
-        sync_status: "OK",
-        progress: 79
-      },
-      line_items: [
-        {
-          id:"LI-1010-GREEN",
-          title:"Коробочка тактична 1010 — індивідуальний дизайн",
-          sku:"1010 Зелена",
-          qty:1,
-          status:"Done",
-          percent:100,
-          current:"Відправка товару",
-          next:"—",
-          changed_last:"21.02.2026 22:00",
-          thumb_emoji:"📦",
-          tasks: [
-            { name:"Створення макету", status:"Done", changed_at:"21.02.2026 10:12", note:"—" },
-            { name:"Контроль макету", status:"Done", changed_at:"21.02.2026 10:40", note:"—" },
-            { name:"Друк на плівці", status:"Done", changed_at:"21.02.2026 11:05", note:"—" },
-            { name:"Вирізання циферблата", status:"Done", changed_at:"21.02.2026 12:20", note:"—" },
-            { name:"Збірка циферблата", status:"Done", changed_at:"21.02.2026 13:10", note:"—" },
-            { name:"Контроль якості циферблата", status:"Done", changed_at:"21.02.2026 13:45", note:"—" },
-            { name:"Збірка годинника", status:"Done", changed_at:"21.02.2026 16:05", note:"—" },
-            { name:"Нанесення гравіювання", status:"Done", changed_at:"21.02.2026 18:10", note:"—" },
-            { name:"Контроль якості годинника", status:"Done", changed_at:"21.02.2026 19:00", note:"—" },
-            { name:"Відправка товару", status:"Done", changed_at:"21.02.2026 22:00", note:"—" }
-          ]
-        },
-        {
-          id:"LI-AW055",
-          title:"Awarder 055 — індивідуальний дизайн",
-          sku:"Silver-Black",
-          qty:1,
-          status:"InProgress",
-          percent:58,
-          current:"Збірка циферблата",
-          next:"Контроль якості циферблата",
-          changed_last:"21.02.2026 14:02",
-          thumb_emoji:"⌚",
-          tasks: [
-            { name:"Створення макету", status:"Done", changed_at:"21.02.2026 09:30", note:"—" },
-            { name:"Контроль макету", status:"Done", changed_at:"21.02.2026 10:05", note:"—" },
-            { name:"Друк на плівці", status:"Done", changed_at:"21.02.2026 10:40", note:"—" },
-            { name:"Вирізання циферблата", status:"Done", changed_at:"21.02.2026 11:50", note:"—" },
-            { name:"Збірка циферблата", status:"InProgress", changed_at:"21.02.2026 12:15", note:"Активна задача" },
-            { name:"Контроль якості циферблата", status:"Paused", changed_at:"21.02.2026 14:02", note:"Очікує деталі" },
-            { name:"Збірка годинника", status:"Canceled", changed_at:"—", note:"Ще не запускали" },
-            { name:"Нанесення гравіювання", status:"Canceled", changed_at:"—", note:"—" },
-            { name:"Контроль якості годинника", status:"Canceled", changed_at:"—", note:"—" },
-            { name:"Відправка товару", status:"Canceled", changed_at:"—", note:"—" }
-          ]
-        }
-      ]
-    };
+      <div class="stat">
+        <div class="label"><span class="dot"></span> Поточне завдання</div>
+        <div class="value" id="kCurrent">—</div>
+        <div class="hint">
+          <span class="chip" id="kCurrentDue">Термін: —</span>
+          <span class="chip" id="kCurrentPrio">Пріоритет: —</span>
+        </div>
+      </div>
 
-    const $ = (id) => document.getElementById(id);
+      <div class="stat">
+        <div class="label"><span class="dot"></span> Наступне завдання</div>
+        <div class="value" id="kNext">—</div>
+        <div class="hint">
+          <span class="chip" id="kNextDue">Термін: —</span>
+          <span class="chip" id="kNextPrio">Пріоритет: —</span>
+        </div>
+      </div>
 
-    function esc(s){
-      return String(s ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
+      <div class="stat">
+        <div class="label"><span class="dot"></span> Час зміни</div>
+        <div class="value" id="kShift">09:00–18:00</div>
+        <div class="hint">
+          <span class="chip" id="kShiftLeft">Залишилось: —</span>
+          <span class="chip" id="kShiftState">Статус: —</span>
+        </div>
+      </div>
+    </div>
 
-    function showError(msg){
-      const el = $("err");
-      el.textContent = msg;
-      el.classList.add("show");
-    }
-    function clearError(){
-      const el = $("err");
-      el.textContent = "";
-      el.classList.remove("show");
-    }
-
-    function statusLabel(s){
-      return ({
-        Done:"Виконано",
-        InProgress:"У роботі",
-        Paused:"На паузі",
-        Blocked:"Заблоковано",
-        Canceled:"Скасовано"
-      }[s] || "—");
-    }
-    function statusClass(s){
-      return ({
-        Done:"st-done",
-        InProgress:"st-progress",
-        Paused:"st-paused",
-        Blocked:"st-blocked",
-        Canceled:"st-canceled"
-      }[s] || "st-canceled");
-    }
-    function statusBarClass(s){
-      if(s==="Done") return "";            // green default
-      if(s==="InProgress") return "blue";
-      if(s==="Paused") return "orange";
-      if(s==="Blocked") return "red";
-      return "";
-    }
-    function dotClass(s){
-      if(s==="Done") return "background: var(--green)";
-      if(s==="InProgress") return "background: var(--blue)";
-      if(s==="Paused") return "background: var(--orange)";
-      if(s==="Blocked") return "background: var(--red)";
-      return "background: var(--gray)";
-    }
-    function safeNum(n, def=0){
-      const x = Number(n);
-      return Number.isFinite(x) ? x : def;
-    }
-
-    // ===== This is what IT will replace (real fetch) =====
-    async function fetchOrder(externalId){
-      // DEMO behavior:
-      const data = JSON.parse(JSON.stringify(DEMO));
-      data.order.external_order_id = externalId;
-
-      if(!externalId || externalId.length < 3) {
-        throw new Error("Введи коректний номер замовлення.");
-      }
-      return data;
-
-      // REAL (example, should be backend proxy):
-      // const r = await fetch(`/api/order?externalId=${encodeURIComponent(externalId)}`);
-      // if(!r.ok) throw new Error("Замовлення не знайдено або помилка API.");
-      // return await r.json();
-    }
-
-    function render(data){
-      $("orderBox").style.display = "block";
-
-      $("orderId").textContent = data.order.external_order_id;
-
-      $("orderMeta").innerHTML = `
-        <span>📅 Створено: <b>${esc(data.order.created_at)}</b></span>
-        <span>⏳ Дедлайн: <b>${esc(data.order.deadline)}</b></span>
-        <span>👤 Клієнт: <b>${esc(data.order.customer)}</b></span>
-      `;
-
-      const syncOk = String(data.order.sync_status || "OK").toUpperCase() === "OK";
-      $("syncPill").className = "pill " + (syncOk ? "ok" : "");
-      $("syncPill").innerHTML = `<span class="dot"></span> Sync: ${esc(data.order.sync_status || "—")}`;
-
-      const op = safeNum(data.order.progress, 0);
-      $("orderBar").style.width = `${op}%`;
-      $("orderPct").textContent = `${op}%`;
-
-      const items = data.line_items || [];
-      const total = items.length;
-      const inWork = items.filter(x=>x.status==="InProgress").length;
-      const risks = items.filter(x=>x.status==="Blocked").length;
-      $("itemsSummary").textContent = `К-сть позицій: ${total} · У роботі: ${inWork} · Ризики: ${risks}`;
-
-      const root = $("items");
-      root.innerHTML = "";
-
-      if(!total){
-        root.innerHTML = `<div class="empty">Немає позицій у замовленні</div>`;
-        return;
-      }
-
-      items.forEach(li=>{
-        const stCls = statusClass(li.status);
-        const pct = safeNum(li.percent, 0);
-        const barCls = statusBarClass(li.status);
-        const changed = li.changed_last || "—";
-
-        const el = document.createElement("div");
-        el.className = "item";
-        el.innerHTML = `
-          <div class="thumb">
-            ${li.thumb_url ? `<img src="${esc(li.thumb_url)}" alt="">` : `<div class="emoji">${esc(li.thumb_emoji || "📦")}</div>`}
+    <div class="main">
+      <!-- Left: tasks -->
+      <div class="panel">
+        <div class="panelHead">
+          <div class="title">
+            📋 Завдання
+            <small id="countLine">—</small>
           </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="btn" id="exportBtn">Експорт JSON</button>
+            <button class="btn" id="importBtn">Імпорт JSON</button>
+            <input id="fileIn" type="file" accept="application/json" style="display:none" />
+          </div>
+        </div>
+        <div class="panelBody">
+          <div class="list" id="list"></div>
+        </div>
+      </div>
 
-          <div class="itemMain">
-            <div class="titleRow">
-              <div class="titleBlock">
-                <p class="itemTitle">${esc(li.title)}</p>
-                <div class="skuLine">SKU: <b>${esc(li.sku)}</b></div>
+      <!-- Right: quick add / settings -->
+      <div class="sideGrid">
+        <div class="panel">
+          <div class="panelHead">
+            <div class="title">➕ Додати завдання <small>(швидко)</small></div>
+          </div>
+          <div class="panelBody">
+            <div class="field">
+              <label>Назва / модель</label>
+              <input id="fName" type="text" placeholder="Напр.: Циферблат • AW-021 • УФ друк" />
+            </div>
+
+            <div class="formRow" style="margin-top:10px">
+              <div class="field">
+                <label>Термін</label>
+                <input id="fDue" type="date" />
               </div>
-
-              <span class="statusPill ${stCls}">
-                <span class="sDot"></span> ${esc(statusLabel(li.status))}
-              </span>
+              <div class="field">
+                <label>Пріоритет</label>
+                <select id="fPrio">
+                  <option value="low">Низький</option>
+                  <option value="med" selected>Середній</option>
+                  <option value="high">Високий</option>
+                  <option value="urgent">Терміново</option>
+                </select>
+              </div>
             </div>
 
-            <div class="chipsRow">
-              <span class="chip">К-сть: <strong>${safeNum(li.qty, 0)}</strong></span>
-              <span class="chip">Current: <strong>${esc(li.current || "—")}</strong></span>
-              <span class="chip">Next: <strong>${esc(li.next || "—")}</strong></span>
-              <span class="chip">Час зміни: <strong>${esc(changed)}</strong></span>
+            <div class="formRow" style="margin-top:10px">
+              <div class="field">
+                <label>Статус</label>
+                <select id="fStatus">
+                  <option value="todo" selected>До роботи</option>
+                  <option value="doing">В роботі</option>
+                  <option value="done">Виконано</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Фото (URL)</label>
+                <input id="fImg" type="text" placeholder="https://..." />
+              </div>
+            </div>
+
+            <div class="field" style="margin-top:10px">
+              <label>Коментар</label>
+              <textarea id="fNote" placeholder="Коротко: що саме зробити / нюанси"></textarea>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:12px;">
+              <button class="btn primary" id="addBtn" style="flex:1;">Додати</button>
+              <button class="btn" id="demoBtn">Демо</button>
+            </div>
+
+            <div class="hintLine" style="margin-top:10px;">
+              Порада: працівникам достатньо відкрити цю сторінку на телефоні. Відмітки “виконано”
+              зберігаються в браузері (localStorage). Для спільної синхронізації — підʼєднаємо Google Sheets/Backend.
             </div>
           </div>
+        </div>
 
-          <div class="itemRight">
-            <div class="smallLabel">Прогрес</div>
-            <div class="miniBar ${barCls}">
-              <div style="width:${pct}%"></div>
-            </div>
-            <div class="smallLabel">${pct}%</div>
+        <div class="panel">
+          <div class="panelHead">
+            <div class="title">⚙️ Зміна <small>(налаштування)</small></div>
           </div>
-        `;
+          <div class="panelBody">
+            <div class="formRow">
+              <div class="field">
+                <label>Початок зміни</label>
+                <input id="sStart" type="text" value="09:00" />
+              </div>
+              <div class="field">
+                <label>Кінець зміни</label>
+                <input id="sEnd" type="text" value="18:00" />
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:12px;">
+              <button class="btn primary" id="saveShiftBtn" style="flex:1;">Зберегти</button>
+              <button class="btn" id="clearBtn">Очистити дані</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        el.addEventListener("click", ()=> openDetails(li));
-        root.appendChild(el);
-      });
+    <div class="foot">Awarder • internal dashboard • v2 (modern dark)</div>
+  </div>
+
+<script>
+  // ====== State ======
+  const LS_KEY = "awarder_dashboard_v2_tasks";
+  const LS_SHIFT = "awarder_dashboard_v2_shift";
+
+  /** @type {{id:string,name:string,due:string,prio:'low'|'med'|'high'|'urgent',status:'todo'|'doing'|'done',img:string,note:string,doneAt?:string}[]} */
+  let tasks = loadTasks();
+
+  let shift = loadShift();
+  if (!shift) {
+    shift = { start:"09:00", end:"18:00" };
+    saveShift(shift);
+  }
+
+  // ====== Helpers ======
+  const $ = (id) => document.getElementById(id);
+
+  function uid(){
+    return Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
+  }
+  function todayISO(){
+    const d = new Date();
+    const z = (n)=> String(n).padStart(2,"0");
+    return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`;
+  }
+  function fmtDate(iso){
+    if (!iso) return "—";
+    const [y,m,d] = iso.split("-").map(Number);
+    if (!y||!m||!d) return iso;
+    return `${String(d).padStart(2,"0")}.${String(m).padStart(2,"0")}.${y}`;
+  }
+  function prioLabel(p){
+    return {low:"Низький", med:"Середній", high:"Високий", urgent:"Терміново"}[p] || p;
+  }
+  function prioColor(p){
+    if (p==="urgent") return "var(--bad)";
+    if (p==="high") return "var(--warn)";
+    return "rgba(255,255,255,.70)";
+  }
+  function statusLabel(s){
+    return {todo:"До роботи", doing:"В роботі", done:"Виконано"}[s] || s;
+  }
+  function badgeClass(s){
+    if (s==="done") return "good";
+    if (s==="doing") return "warn";
+    return "bad";
+  }
+
+  function loadTasks(){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){
+      return [];
+    }
+  }
+  function saveTasks(){
+    localStorage.setItem(LS_KEY, JSON.stringify(tasks));
+  }
+
+  function loadShift(){
+    try{
+      const raw = localStorage.getItem(LS_SHIFT);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){
+      return null;
+    }
+  }
+  function saveShift(v){
+    localStorage.setItem(LS_SHIFT, JSON.stringify(v));
+  }
+
+  function parseTimeHM(hm){
+    // "09:30" -> minutes from 00:00
+    const m = /^(\d{1,2}):(\d{2})$/.exec((hm||"").trim());
+    if(!m) return null;
+    const hh = Number(m[1]);
+    const mm = Number(m[2]);
+    if(hh<0||hh>23||mm<0||mm>59) return null;
+    return hh*60+mm;
+  }
+  function minutesToHM(min){
+    const hh = Math.floor(min/60);
+    const mm = min%60;
+    return String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0");
+  }
+
+  // ====== Rendering ======
+  function getFiltered(){
+    const q = ($("q").value || "").toLowerCase().trim();
+    const sf = $("statusFilter").value;
+
+    return tasks.filter(t=>{
+      const okQ = !q || (t.name||"").toLowerCase().includes(q) || (t.note||"").toLowerCase().includes(q);
+      const okS = (sf==="all") || t.status===sf;
+      return okQ && okS;
+    });
+  }
+
+  function sortForDashboard(arr){
+    // order: doing first (earliest due), then todo (earliest due), then done (latest done)
+    const rankStatus = (s)=> s==="doing"?0 : s==="todo"?1 : 2;
+    const rankPrio = (p)=> p==="urgent"?0 : p==="high"?1 : p==="med"?2 : 3;
+    return [...arr].sort((a,b)=>{
+      const rs = rankStatus(a.status) - rankStatus(b.status);
+      if(rs!==0) return rs;
+      const rp = rankPrio(a.prio) - rankPrio(b.prio);
+      if(rp!==0) return rp;
+      const da = a.due || "9999-12-31";
+      const db = b.due || "9999-12-31";
+      if(da<db) return -1;
+      if(da>db) return 1;
+      return (a.name||"").localeCompare(b.name||"");
+    });
+  }
+
+  function render(){
+    // Top clock line
+    const now = new Date();
+    $("nowLine").textContent = now.toLocaleString("uk-UA", { weekday:"long", year:"numeric", month:"long", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+
+    // Stats
+    const total = tasks.length;
+    const todo = tasks.filter(t=>t.status!=="done").length;
+    const done = tasks.filter(t=>t.status==="done").length;
+
+    $("kQty").textContent = total;
+    $("kTodo").textContent = "До роботи: " + todo;
+    $("kDone").textContent = "Виконано: " + done;
+
+    const ordered = sortForDashboard(tasks);
+    const current = ordered.find(t=>t.status==="doing") || ordered.find(t=>t.status==="todo") || null;
+    const next = (() => {
+      if(!current) return null;
+      const idx = ordered.findIndex(t=>t.id===current.id);
+      for(let i=idx+1;i<ordered.length;i++){
+        if(ordered[i].status!=="done") return ordered[i];
+      }
+      return null;
+    })();
+
+    $("kCurrent").textContent = current ? ell(current.name, 26) : "—";
+    $("kCurrentDue").textContent = "Термін: " + (current ? fmtDate(current.due) : "—");
+    $("kCurrentPrio").textContent = "Пріоритет: " + (current ? prioLabel(current.prio) : "—");
+
+    $("kNext").textContent = next ? ell(next.name, 26) : "—";
+    $("kNextDue").textContent = "Термін: " + (next ? fmtDate(next.due) : "—");
+    $("kNextPrio").textContent = "Пріоритет: " + (next ? prioLabel(next.prio) : "—");
+
+    // Shift
+    const startM = parseTimeHM(shift.start);
+    const endM = parseTimeHM(shift.end);
+    $("kShift").textContent = `${shift.start}–${shift.end}`;
+
+    const nowM = now.getHours()*60 + now.getMinutes();
+    let shiftState = "—";
+    let left = "—";
+
+    if(startM!=null && endM!=null){
+      // assume start < end same day
+      if(nowM < startM){
+        shiftState = "До початку";
+        left = `До старту: ${minutesToHM(startM - nowM)}`;
+      }else if(nowM >= startM && nowM <= endM){
+        shiftState = "Йде зміна";
+        left = `Залишилось: ${minutesToHM(endM - nowM)}`;
+      }else{
+        shiftState = "Після зміни";
+        left = "Завершено";
+      }
+    }
+    $("kShiftLeft").textContent = left;
+    $("kShiftState").textContent = "Статус: " + shiftState;
+
+    // List
+    const filtered = getFiltered();
+    $("countLine").textContent = `Показано: ${filtered.length} / ${tasks.length}`;
+
+    const list = $("list");
+    list.innerHTML = "";
+
+    if(filtered.length===0){
+      const empty = document.createElement("div");
+      empty.className = "row";
+      empty.innerHTML = `
+        <div class="statusBox">
+          <span class="badge"><i></i> Немає</span>
+        </div>
+        <div class="cardMain">
+          <div class="thumb"></div>
+          <div class="taskText">
+            <p class="taskName">Нічого не знайдено</p>
+            <div class="taskSub">Спробуй інший пошук або додай нове завдання справа.</div>
+          </div>
+        </div>
+        <div class="meta"></div>
+        <div class="actions"></div>
+      `;
+      list.appendChild(empty);
+      return;
     }
 
-    function openDetails(li){
-      $("overlay").classList.add("show");
-      $("overlay").setAttribute("aria-hidden","false");
+    const view = sortForDashboard(filtered);
+    for(const t of view){
+      const row = document.createElement("div");
+      row.className = "row" + (t.status==="done" ? " done" : "");
+      row.dataset.id = t.id;
 
-      $("drawerTitle").textContent = li.title;
-
-      const stCls = statusClass(li.status);
-
-      $("drawerMeta").innerHTML = `
-        <span>ID: <b>${esc(li.id)}</b></span>
-        <span>SKU: <b>${esc(li.sku)}</b></span>
-        <span>К-сть: <b>${safeNum(li.qty,0)}</b></span>
-        <span>Остання зміна: <b>${esc(li.changed_last || "—")}</b></span>
-        <span class="statusPill ${stCls}" style="padding:7px 10px; font-size:11px;">
-          <span class="sDot"></span> ${esc(statusLabel(li.status))}
+      const badge = `
+        <span class="badge ${badgeClass(t.status)}" title="Статус">
+          <i></i> ${statusLabel(t.status)}
         </span>
       `;
 
-      $("drawerSub").innerHTML = `
-        <span>Current: <b>${esc(li.current || "—")}</b></span>
-        <span>Next: <b>${esc(li.next || "—")}</b></span>
-        <span>Прогрес: <b>${safeNum(li.percent,0)}%</b></span>
-      `;
+      row.innerHTML = `
+        <div class="statusBox">
+          ${badge}
+        </div>
 
-      const tasksRoot = $("tasks");
-      tasksRoot.innerHTML = "";
-
-      const tasks = li.tasks || [];
-      if(!tasks.length){
-        tasksRoot.innerHTML = `<div class="empty">Немає задач по цій позиції</div>`;
-        return;
-      }
-
-      tasks.forEach(t=>{
-        const tCls = statusClass(t.status);
-        const dotStyle = dotClass(t.status);
-
-        const row = document.createElement("div");
-        row.className = "task";
-        row.innerHTML = `
-          <div class="taskLeft">
-            <div class="tDot" style="${dotStyle}"></div>
-            <div style="min-width:0">
-              <p class="tName">${esc(t.name)}</p>
-              <p class="tNote">${esc(t.note || "—")}</p>
+        <div class="cardMain">
+          <div class="thumb">${t.img ? `<img alt="" src="${escapeHtml(t.img)}" />` : ""}</div>
+          <div class="taskText">
+            <p class="taskName" title="${escapeHtml(t.name||"")}">${escapeHtml(t.name||"")}</p>
+            <div class="taskSub">
+              <span class="chip">📅 ${fmtDate(t.due)}</span>
+              <span class="chip">⚡ <span style="color:${prioColor(t.prio)}; font-weight:900">${prioLabel(t.prio)}</span></span>
+              ${t.note ? `<span class="chip">📝 ${escapeHtml(ell(t.note, 38))}</span>` : ""}
             </div>
           </div>
-          <div class="taskRight">
-            <span class="statusPill ${tCls}" style="padding:7px 10px; font-size:11px;">
-              <span class="sDot"></span> ${esc(statusLabel(t.status))}
-            </span>
-            <span class="tTime">${esc(t.changed_at || "—")}</span>
-          </div>
-        `;
-        tasksRoot.appendChild(row);
+        </div>
+
+        <div class="meta">
+          <div class="due">Термін: <b>${fmtDate(t.due)}</b></div>
+          <div class="prio" style="color:${prioColor(t.prio)}">${prioLabel(t.prio)}</div>
+        </div>
+
+        <div class="actions">
+          <label class="chk" title="Виконано">
+            <input type="checkbox" ${t.status==="done" ? "checked" : ""} />
+            ✔
+          </label>
+          <button class="miniBtn" data-act="cycle">Статус</button>
+          <button class="miniBtn" data-act="del">Видалити</button>
+        </div>
+      `;
+
+      // Handlers
+      row.querySelector('input[type="checkbox"]').addEventListener("change", (e)=>{
+        const checked = e.target.checked;
+        setStatus(t.id, checked ? "done" : "todo");
       });
-    }
 
-    function closeDetails(){
-      $("overlay").classList.remove("show");
-      $("overlay").setAttribute("aria-hidden","true");
-    }
+      row.querySelector('[data-act="cycle"]').addEventListener("click", ()=>{
+        cycleStatus(t.id);
+      });
 
-    async function onSearch(){
-      clearError();
-      const externalId = $("q").value.trim();
-      if(!externalId){
-        showError("Введи номер замовлення (external_order_id), напр. O-AW-3918");
-        return;
+      row.querySelector('[data-act="del"]').addEventListener("click", ()=>{
+        removeTask(t.id);
+      });
+
+      list.appendChild(row);
+    }
+  }
+
+  function ell(s, n){
+    s = String(s||"");
+    return s.length>n ? s.slice(0,n-1)+"…" : s;
+  }
+  function escapeHtml(str){
+    return String(str||"")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  // ====== Actions ======
+  function addTask(t){
+    tasks.unshift(t); // newest on top, sorting will handle view
+    saveTasks();
+    render();
+  }
+  function removeTask(id){
+    tasks = tasks.filter(t=>t.id!==id);
+    saveTasks();
+    render();
+  }
+  function setStatus(id, status){
+    const t = tasks.find(x=>x.id===id);
+    if(!t) return;
+    t.status = status;
+    if(status==="done") t.doneAt = new Date().toISOString();
+    saveTasks();
+    render();
+  }
+  function cycleStatus(id){
+    const t = tasks.find(x=>x.id===id);
+    if(!t) return;
+    const order = ["todo","doing","done"];
+    const i = order.indexOf(t.status);
+    const next = order[(i+1)%order.length];
+    setStatus(id, next);
+  }
+
+  // ====== Events ======
+  $("q").addEventListener("input", render);
+  $("statusFilter").addEventListener("change", render);
+
+  $("addBtn").addEventListener("click", ()=>{
+    const name = $("fName").value.trim();
+    if(!name){
+      alert("Введи назву завдання.");
+      return;
+    }
+    const t = {
+      id: uid(),
+      name,
+      due: $("fDue").value || "",
+      prio: $("fPrio").value,
+      status: $("fStatus").value,
+      img: $("fImg").value.trim(),
+      note: $("fNote").value.trim()
+    };
+    addTask(t);
+
+    // reset form
+    $("fName").value = "";
+    $("fImg").value = "";
+    $("fNote").value = "";
+    $("fStatus").value = "todo";
+    $("fPrio").value = "med";
+  });
+
+  $("demoBtn").addEventListener("click", ()=>{
+    if(tasks.length>0 && !confirm("Додати демо-завдання? (існуючі не видаляються)")) return;
+    const base = todayISO();
+    addTask({ id: uid(), name:"УФ друк • AW-021 • Партія 30 шт", due: base, prio:"urgent", status:"doing", img:"", note:"Перевірити макет, друк + сушка" });
+    addTask({ id: uid(), name:"Лазер • заготовка • AW-020", due: base, prio:"high", status:"todo", img:"", note:"Вирізати 50 шт, контроль краю" });
+    addTask({ id: uid(), name:"Збірка циферблатів • AW-022", due: "", prio:"med", status:"todo", img:"", note:"Підбір стрілок, перевірка люфту" });
+    addTask({ id: uid(), name:"Контроль якості годинника • AW-019", due: "", prio:"low", status:"todo", img:"", note:"Вибірково 10 шт" });
+  });
+
+  $("resetBtn").addEventListener("click", ()=>{
+    $("q").value = "";
+    $("statusFilter").value = "all";
+    render();
+  });
+
+  $("clearBtn").addEventListener("click", ()=>{
+    if(!confirm("Точно очистити всі завдання на цьому пристрої?")) return;
+    tasks = [];
+    saveTasks();
+    render();
+  });
+
+  $("saveShiftBtn").addEventListener("click", ()=>{
+    const s = $("sStart").value.trim();
+    const e = $("sEnd").value.trim();
+    if(parseTimeHM(s)==null || parseTimeHM(e)==null){
+      alert("Формат часу має бути HH:MM (наприклад 09:00).");
+      return;
+    }
+    shift = { start:s, end:e };
+    saveShift(shift);
+    render();
+  });
+
+  // Export / Import JSON
+  $("exportBtn").addEventListener("click", ()=>{
+    const blob = new Blob([JSON.stringify({ tasks, shift }, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "awarder-dashboard.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  $("importBtn").addEventListener("click", ()=> $("fileIn").click());
+
+  $("fileIn").addEventListener("change", async (e)=>{
+    const f = e.target.files?.[0];
+    if(!f) return;
+    try{
+      const text = await f.text();
+      const data = JSON.parse(text);
+      if(data.tasks && Array.isArray(data.tasks)){
+        tasks = data.tasks;
+        saveTasks();
       }
-
-      try{
-        const data = await fetchOrder(externalId);
-        render(data);
-      }catch(e){
-        console.error(e);
-        showError(e?.message || "Помилка. Перевір номер замовлення або API.");
-        $("orderBox").style.display = "none";
+      if(data.shift && data.shift.start && data.shift.end){
+        shift = data.shift;
+        saveShift(shift);
+        $("sStart").value = shift.start;
+        $("sEnd").value = shift.end;
       }
+      render();
+    }catch(err){
+      alert("Не вдалося імпортувати JSON.");
+    }finally{
+      e.target.value = "";
     }
+  });
 
-    // Events
-    $("btnSearch").addEventListener("click", onSearch);
-    $("btnDemo").addEventListener("click", ()=>{
-      $("q").value = DEMO.order.external_order_id;
-      render(DEMO);
-      clearError();
-    });
-    $("q").addEventListener("keydown",(e)=>{ if(e.key==="Enter") onSearch(); });
-    $("btnClose").addEventListener("click", closeDetails);
-    $("overlay").addEventListener("click",(e)=>{ if(e.target === $("overlay")) closeDetails(); });
-    window.addEventListener("keydown",(e)=>{ if(e.key==="Escape") closeDetails(); });
+  // ====== Init ======
+  $("fDue").value = todayISO();
+  $("sStart").value = shift.start;
+  $("sEnd").value = shift.end;
 
-    // Init with demo so page never "white screens"
-    render(DEMO);
-  </script>
+  render();
+  setInterval(render, 20_000); // refresh clock + shift remaining
+</script>
 </body>
 </html>
